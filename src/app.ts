@@ -1,13 +1,17 @@
 import { default as express } from 'express';
 import { default as mongoose } from 'mongoose';
+import { default as logger } from 'morgan';
+import { default as passport } from 'passport';
 import * as bodyParser from 'body-parser';
 
+import { CONFIG } from './config';
 import { Router } from './routes';
 
 class App {
   public app: express.Application;
   public router: Router;
-  public mongoUrl: string = 'mongodb://clicktronix:23031994@localhost/roulette-rest';
+  public mongoUrl: string = 'mongodb://' + CONFIG.db_user + ':' + CONFIG.db_password + '@'
+    + CONFIG.db_host + ':' + CONFIG.db_port + '/' + CONFIG.db_name;
 
   constructor() {
     this.app = express();
@@ -17,15 +21,20 @@ class App {
   }
 
   private expressConfig(): void {
-    // support application/x-www-form-urlencoded post data
-    this.app.use(bodyParser.urlencoded({ extended: true }));
-    // support application/json type post data
+    this.app.use(logger('dev'));
+    this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(bodyParser.json({ limit: '50mb' }));
+    this.app.use(passport.initialize());
   }
 
   private mongoSetup(): void {
-    mongoose.connect(this.mongoUrl, { useNewUrlParser: true });
+    mongoose.set('debug', true);
+    mongoose.connect(this.mongoUrl, { useNewUrlParser: true, useCreateIndex: true });
   }
 }
+
+process.on('unhandledRejection', error => {
+  console.error('Uncaught Error', error);
+});
 
 export default new App().app;
