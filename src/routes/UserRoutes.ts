@@ -1,23 +1,23 @@
 
-import { Application } from 'express';
+import { Router } from 'express';
 import { default as passport } from 'passport';
 
 import { UserController } from '../controllers';
-export default class UserRoutes {
+
+class UserRoutes {
+  public router: Router;
   private userController: UserController = new UserController();
-  private app: Application;
 
-  constructor(app: Application) {
-    this.app = app;
-  }
-
-  public getRoutes() {
-    this.app.route('/users')
+  constructor() {
+    this.router = Router();
+    this.router.route('/')
       .get(passport.authenticate('jwt', { session: false }), this.userController.getUsers);
 
-    this.app.route('/users/:userId')
+    this.router.route('/:userId')
       .get(passport.authenticate('jwt', { session: false }), this.userController.getUserById)
       .put(passport.authenticate('jwt', { session: false }), this.userController.updateUser)
       .delete(passport.authenticate('jwt', { session: false }), this.userController.deleteUser);
   }
 }
+
+export const userRoutes = new UserRoutes().router;

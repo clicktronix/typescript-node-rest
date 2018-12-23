@@ -1,20 +1,19 @@
-import { Application } from 'express';
+import { Router } from 'express';
 
 import { AuthController } from '../controllers';
 
-export default class AuthRoutes {
+class AuthRoutes {
+  public router: Router;
   private authController: AuthController = new AuthController();
-  private app: Application;
 
-  constructor(app: Application) {
-    this.app = app;
-  }
-
-  public getRoutes() {
-    this.app.route('/register')
+  constructor() {
+    this.router = Router();
+    this.router.route('/register')
       .post(this.authController.registerNewUser);
 
-    this.app.route('/login')
+    this.router.route('/authenticate')
       .post(this.authController.registerNewUser);
   }
 }
+
+export const authRoutes = new AuthRoutes().router;

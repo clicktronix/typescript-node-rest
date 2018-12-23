@@ -2,7 +2,6 @@ import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import to from 'await-to-js';
 import * as jwt from 'jsonwebtoken';
-const validate = require('mongoose-validator');
 
 import { IUser } from 'shared/types/models';
 import { CONFIG } from '../config';
@@ -11,36 +10,33 @@ const Schema = mongoose.Schema;
 const SALT_ROUND = 10;
 
 export const UserSchema = new Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  phone: {
+  firstName: {
     type: String,
     required: true,
-    lowercase: true,
     trim: true,
-    unique: true,
-    sparse: true,
-    validate: [validate({
-      validator: 'isNumeric',
-      arguments: [7, 20],
-      message: 'Not a valid phone number.',
-    })],
+  },
+  lastName: {
+    type: String,
+    required: true,
   },
   email: {
     type: String,
-    required: true,
-    lowercase: true,
-    trim: true,
     unique: true,
-    sparse: true,
-    validate: [validate({
-      validator: 'isEmail',
-      message: 'Not a valid email.',
-    })],
+    match: /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
+    required: true,
+    trim: true,
   },
-  password: { type: String, required: true },
+  password: {
+    type: String,
+    required: true,
+    trim: true,
+  },
 
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    useNestedStrict: true,
+  },
+);
 
 UserSchema.pre('save', async (next) => {
   if (this.isModified('password') || this.isNew) {

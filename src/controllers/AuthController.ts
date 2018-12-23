@@ -16,6 +16,7 @@ export default class AuthController {
         ...user,
         token: user.getJWT(),
       });
+      res.end();
     });
   }
 
@@ -32,5 +33,6 @@ export default class AuthController {
       ...verifiedUser,
       token: verifiedUser!.getJWT(),
     });
+    res.end();
   }
 }

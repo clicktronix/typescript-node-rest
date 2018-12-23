@@ -1,40 +1,44 @@
 import { default as express } from 'express';
-import { default as mongoose } from 'mongoose';
 import { default as logger } from 'morgan';
 import { default as passport } from 'passport';
+import { default as cors } from 'cors';
 import * as bodyParser from 'body-parser';
 
-import { CONFIG } from './config';
-import { Router } from './routes';
+import { BaseRouter as Router } from './routes';
+import * as errorHandler from './shared/helpers/errorHandler';
+import { checkUserToken } from './middlewares/checkUserToken';
 
 class App {
   public app: express.Application;
   public router: Router;
-  public mongoUrl: string = 'mongodb://' + CONFIG.db_user + ':' + CONFIG.db_password + '@'
-    + CONFIG.db_host + ':' + CONFIG.db_port + '/' + CONFIG.db_name;
+  private corsOptions: cors.CorsOptions = {
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Access-Token'],
+    credentials: true,
+    methods: 'GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE',
+    preflightContinue: true,
+    optionsSuccessStatus: 200,
+  };
 
   constructor() {
     this.app = express();
-    this.expressConfig();
-    this.router = new Router(this.app);
-    this.mongoSetup();
+    this.setMiddlewares();
+    this.router = new Router();
+    this.catchErrors();
   }
 
-  private expressConfig(): void {
+  private setMiddlewares(): void {
     this.app.use(logger('dev'));
+    this.app.use(cors(this.corsOptions));
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(bodyParser.json({ limit: '50mb' }));
     this.app.use(passport.initialize());
+    checkUserToken(passport);
   }
 
-  private mongoSetup(): void {
-    mongoose.set('debug', true);
-    mongoose.connect(this.mongoUrl, { useNewUrlParser: true, useCreateIndex: true });
+  private catchErrors(): void {
+    this.app.use(errorHandler.notFound);
+    this.app.use(errorHandler.internalServerError);
   }
 }
-
-process.on('unhandledRejection', error => {
-  console.error('Uncaught Error', error);
-});
 
 export default new App().app;

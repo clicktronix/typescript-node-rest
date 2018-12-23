@@ -1,7 +1,12 @@
-import app from './app';
+import app from './App';
+import { CONFIG, dataBaseConnect } from './config';
 
-const PORT = 3000;
+const PORT = CONFIG.PORT;
+dataBaseConnect();
 
-app.listen(PORT, () => {
-  console.log('Express server listening on port ' + PORT);
+app.listen(PORT, (err: Error) => {
+  if (err) {
+    return console.log(err);
+  }
+  console.log(`Server is listening on ${PORT}`);
 });

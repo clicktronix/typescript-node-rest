@@ -7,6 +7,7 @@ export default class UserController {
     await User.find({}, (err, user) => {
       if (err || !user) { return res.send(err); }
       res.json(user);
+      res.end();
     });
   }
 
@@ -14,6 +15,7 @@ export default class UserController {
     await User.findById(req.params.userId, (err, user) => {
       if (err || !user) { return res.send(err); }
       res.json(user);
+      res.end();
     });
   }
 
@@ -21,6 +23,7 @@ export default class UserController {
     await User.findOneAndUpdate({ _id: req.params.userId }, req.body, { new: true }, (err, user) => {
       if (err || !user) { return res.send(err); }
       res.json(user);
+      res.end();
     });
   }
 
@@ -28,6 +31,7 @@ export default class UserController {
     await User.remove({ _id: req.params.contactId }, (err) => {
       if (err) { return res.send(err); }
       res.json({ message: 'Successfully deleted user!' });
+      res.end();
     });
   }
 }
