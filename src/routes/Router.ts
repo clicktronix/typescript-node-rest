@@ -1,8 +1,11 @@
 import { Application, Request, Response, NextFunction } from 'express';
 import { default as cors } from 'cors';
 import { ServerError } from 'shared/types';
+import { default as passport } from 'passport';
 
 import UserRoutes from './UserRoutes';
+import AuthRoutes from './AuthRoutes';
+import { checkUserToken } from '../middleware/checkUserToken';
 import { UserController } from '../controllers';
 
 export class Router {
@@ -16,6 +19,7 @@ export class Router {
   };
 
   public constructor(app: Application) {
+    checkUserToken(passport);
     // CORS
     app.use(cors(this.corsOptions));
     app.use('/', (_req, res) => {
@@ -46,5 +50,7 @@ export class Router {
 
     const userRoutes = new UserRoutes(app);
     userRoutes.getRoutes();
+    const authRoutes = new AuthRoutes(app);
+    authRoutes.getRoutes();
   }
 }

@@ -4,16 +4,18 @@ import to from 'await-to-js';
 import * as jwt from 'jsonwebtoken';
 const validate = require('mongoose-validator');
 
+import { IUser } from 'shared/types/models';
 import { CONFIG } from '../config';
 
 const Schema = mongoose.Schema;
 const SALT_ROUND = 10;
 
 export const UserSchema = new Schema({
-  firstName: { type: String },
-  lastName: { type: String },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
   phone: {
     type: String,
+    required: true,
     lowercase: true,
     trim: true,
     unique: true,
@@ -26,6 +28,7 @@ export const UserSchema = new Schema({
   },
   email: {
     type: String,
+    required: true,
     lowercase: true,
     trim: true,
     unique: true,
@@ -35,7 +38,7 @@ export const UserSchema = new Schema({
       message: 'Not a valid email.',
     })],
   },
-  password: { type: String },
+  password: { type: String, required: true },
 
 }, { timestamps: true });
 
@@ -54,7 +57,7 @@ UserSchema.pre('save', async (next) => {
   }
 });
 
-UserSchema.methods.comparePassword = async (pwd: string) => {
+UserSchema.methods.comparePassword = async (pwd: string): Promise<boolean> => {
   if (!this.password) { throw Error('Password not set'); }
 
   const [err, pass] = await to(bcrypt.compare(pwd, this.password));
@@ -64,30 +67,23 @@ UserSchema.methods.comparePassword = async (pwd: string) => {
   return this;
 };
 
-UserSchema.virtual('full_name').set((name: string) => {
+UserSchema.virtual('full_name').set((name: string): void => {
   const split = name.split(' ');
   this.first = split[0];
   this.last = split[1];
 });
 
-UserSchema.virtual('full_name').get(() => {
+UserSchema.virtual('full_name').get((): string | null => {
   if (!this.firstName) { return null; }
   if (!this.lastName) { return this.firstName; }
 
   return this.first + ' ' + this.last;
 });
 
-UserSchema.methods.getJWT = () => {
+UserSchema.methods.getJWT = (): string => {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
   return 'Bearer ' + jwt.sign({ user_id: this._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
 };
 
-UserSchema.methods.toWeb = () => {
-  const json = this.toJSON();
-  // this is for the front end
-  json.id = this._id;
-  return json;
-};
-
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model<IUser>('User', UserSchema);
 export default User;

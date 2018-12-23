@@ -1,17 +1,17 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
 import { PassportStatic } from 'passport';
 
 import User from '../models/userModel';
 import { CONFIG } from '../config/config';
 
-export function passport(passportInstance: PassportStatic) {
-  const opts = {
+export function checkUserToken(passportInstance: PassportStatic) {
+  const opts: StrategyOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: CONFIG.jwt_encryption,
   };
 
   passportInstance.use(new Strategy(opts, async (jwtPayload, done) => {
-    await User.findById(jwtPayload.user_id, (err: Error, res) => {
+    User.findById(jwtPayload.user_id, (err: Error, res) => {
       if (err) { done(new Error(err.message), false); }
       done(null, res);
     });

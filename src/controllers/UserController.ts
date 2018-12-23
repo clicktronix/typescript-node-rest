@@ -3,39 +3,30 @@ import { Request, Response } from 'express';
 import User from '../models/userModel';
 
 export default class UserController {
-  public addNewUser(req: Request, res: Response) {
-    const newUser = new User(req.body);
-
-    newUser.save((err, user) => {
-      err && res.send(err);
+  public async getUsers(_req: Request, res: Response) {
+    await User.find({}, (err, user) => {
+      if (err || !user) { return res.send(err); }
       res.json(user);
     });
   }
 
-  public getUsers(_req: Request, res: Response) {
-    User.find({}, (err, user) => {
-      err && res.send(err);
+  public async getUserById(req: Request, res: Response) {
+    await User.findById(req.params.userId, (err, user) => {
+      if (err || !user) { return res.send(err); }
       res.json(user);
     });
   }
 
-  public getUserWithId(req: Request, res: Response) {
-    User.findById(req.params.userId, (err, user) => {
-      err && res.send(err);
+  public async updateUser(req: Request, res: Response) {
+    await User.findOneAndUpdate({ _id: req.params.userId }, req.body, { new: true }, (err, user) => {
+      if (err || !user) { return res.send(err); }
       res.json(user);
     });
   }
 
-  public updateUser(req: Request, res: Response) {
-    User.findOneAndUpdate({ _id: req.params.userId }, req.body, { new: true }, (err, user) => {
-      err && res.send(err);
-      res.json(user);
-    });
-  }
-
-  public deleteUser(req: Request, res: Response) {
-    User.remove({ _id: req.params.contactId }, (err) => {
-      err && res.send(err);
+  public async deleteUser(req: Request, res: Response) {
+    await User.remove({ _id: req.params.contactId }, (err) => {
+      if (err) { return res.send(err); }
       res.json({ message: 'Successfully deleted user!' });
     });
   }
