@@ -1,21 +1,19 @@
-// import { ExtractJwt, Strategy } from 'passport-jwt';
-// import { UserModel } from '../models';
-// import CONFIG from '../config/config';
-// import { to } from '../services/util.service';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { PassportStatic } from 'passport';
 
-// export function (passport: Passport) {
-//   var opts = {};
-//   opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-//   opts.secretOrKey = CONFIG.jwt_encryption;
+import User from '../models/userModel';
+import { CONFIG } from '../config/config';
 
-//   passport.use(new Strategy(opts, async function (jwt_payload, done) {
-//     let err, user;
-//     [err, user] = await to(User.findById(jwt_payload.user_id));
-//     if (err) return done(err, false);
-//     if (user) {
-//       return done(null, user);
-//     } else {
-//       return done(null, false);
-//     }
-//   }));
-// }
+export function passport(passportInstance: PassportStatic) {
+  const opts = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: CONFIG.jwt_encryption,
+  };
+
+  passportInstance.use(new Strategy(opts, async (jwtPayload, done) => {
+    await User.findById(jwtPayload.user_id, (err: Error, res) => {
+      if (err) { done(new Error(err.message), false); }
+      done(null, res);
+    });
+  }));
+}
