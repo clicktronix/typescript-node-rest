@@ -1,5 +1,8 @@
 import * as dotenv from 'dotenv';
 
+/**
+ * Load environment variables from .env file, where API keys and passwords are configured.
+ */
 dotenv.config();
 
 export const CONFIG: Record<string, string> = {
