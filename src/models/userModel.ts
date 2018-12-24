@@ -41,11 +41,11 @@ export const UserSchema = new Schema({
 UserSchema.pre('save', async (next) => {
   if (this.isModified('password') || this.isNew) {
 
-    const [saltErr, salt] = await to(bcrypt.genSalt(SALT_ROUND));
-    if (saltErr || !salt) { throw Error(saltErr.message); }
+    const [saltErr, salt] = await to<string, Error>(bcrypt.genSalt(SALT_ROUND));
+    if (saltErr || !salt) { throw Error(saltErr ? saltErr.message : 'Salt error.'); }
 
-    const [hashErr, hash] = await to(bcrypt.hash(this.password, salt));
-    if (hashErr) { throw Error(hashErr.message); }
+    const [hashErr, hash] = await to<string, Error>(bcrypt.hash(this.password, salt));
+    if (hashErr) { throw Error(hashErr ? hashErr.message : 'Hash pwd error.'); }
 
     this.password = hash;
   } else {
