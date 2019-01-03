@@ -1,8 +1,7 @@
 
 import { Router } from 'express';
 import { default as passport } from 'passport';
-
-import { UserController } from '../controllers';
+import { UserController } from 'controllers';
 
 class UserRoutes {
   public router: Router;
@@ -11,7 +10,7 @@ class UserRoutes {
   constructor() {
     this.router = Router();
     this.router.route('/')
-      .get(passport.authenticate('jwt', { session: false }), this.userController.getUsers);
+      .get(this.userController.getUsers);
 
     this.router.route('/:userId')
       .get(passport.authenticate('jwt', { session: false }), this.userController.getUserById)

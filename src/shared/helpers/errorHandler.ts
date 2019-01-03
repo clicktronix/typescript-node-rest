@@ -21,3 +21,12 @@ export const internalServerError = (err: any, _req: Request, res: Response, _nex
   });
   res.end();
 };
+
+// get error object with message
+export const getNullErrorData = (errorMessage: string) => {
+  return {
+    success: false,
+    message: errorMessage,
+    data: null,
+  };
+};

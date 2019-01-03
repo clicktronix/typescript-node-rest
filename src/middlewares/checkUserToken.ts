@@ -1,8 +1,8 @@
 import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
 import { PassportStatic } from 'passport';
 
-import User from '../models/userModel';
-import { CONFIG } from '../config/config';
+import User from 'models/userModel';
+import { CONFIG } from 'config';
 
 export function checkUserToken(passportInstance: PassportStatic) {
   const opts: StrategyOptions = {

@@ -1,10 +1,10 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import to from 'await-to-js';
 import * as jwt from 'jsonwebtoken';
-
+import { NextFunction } from 'express';
+import { to } from 'await-to-js';
 import { IUser } from 'shared/types/models';
-import { CONFIG } from '../config';
+import { CONFIG } from 'config';
 
 const Schema = mongoose.Schema;
 const SALT_ROUND = 10;
@@ -38,47 +38,42 @@ export const UserSchema = new Schema({
   },
 );
 
-UserSchema.pre('save', async (next) => {
-  if (this.isModified('password') || this.isNew) {
-
-    const [saltErr, salt] = await to<string, Error>(bcrypt.genSalt(SALT_ROUND));
-    if (saltErr || !salt) { throw Error(saltErr ? saltErr.message : 'Salt error.'); }
-
-    const [hashErr, hash] = await to<string, Error>(bcrypt.hash(this.password, salt));
-    if (hashErr) { throw Error(hashErr ? hashErr.message : 'Hash pwd error.'); }
-
-    this.password = hash;
-  } else {
-    return next();
+/**
+ * Password hash middleware.
+ */
+UserSchema.pre('save', async function preSave(next: NextFunction) {
+  // tslint:disable-next-line:no-this-assignment
+  const user = this;
+  if (!user.isModified('password')) { return next(); }
+  try {
+    await bcrypt.genSalt(SALT_ROUND, (err, salt) => {
+      if (err) { return next(err); }
+      bcrypt.hash(user.password, salt, (error, hash) => {
+        if (error) { return next(error); }
+        user.password = hash;
+        next();
+      });
+    });
+  } catch (error) {
+    return error;
   }
 });
 
-UserSchema.methods.comparePassword = async (pwd: string): Promise<boolean> => {
-  if (!this.password) { throw Error('Password not set'); }
-
-  const [err, pass] = await to(bcrypt.compare(pwd, this.password));
-  if (err) { throw Error(err.message); }
-  if (!pass) { throw Error('Invalid password'); }
-
-  return this;
+/**
+ * Helper method for validating user's password.
+ */
+UserSchema.methods.comparePassword = async function compare(pwd: string) {
+  const [error, isMatch] = await to<boolean, Error>(bcrypt.compare(pwd, this.password));
+  if (error) { return error; }
+  return isMatch;
 };
 
-UserSchema.virtual('full_name').set((name: string): void => {
-  const split = name.split(' ');
-  this.first = split[0];
-  this.last = split[1];
-});
-
-UserSchema.virtual('full_name').get((): string | null => {
-  if (!this.firstName) { return null; }
-  if (!this.lastName) { return this.firstName; }
-
-  return this.first + ' ' + this.last;
-});
-
-UserSchema.methods.getJWT = (): string => {
+/**
+ * Helper method for getting jwt token.
+ */
+UserSchema.methods.getJWT = function createToken() {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
-  return 'Bearer ' + jwt.sign({ user_id: this._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
+  return 'TOKEN' + jwt.sign({ user_id: this._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
 };
 
 const User = mongoose.model<IUser>('User', UserSchema);

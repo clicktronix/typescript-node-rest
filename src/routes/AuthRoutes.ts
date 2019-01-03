@@ -1,6 +1,5 @@
 import { Router } from 'express';
-
-import { AuthController } from '../controllers';
+import { AuthController } from 'controllers';
 
 class AuthRoutes {
   public router: Router;
@@ -12,7 +11,7 @@ class AuthRoutes {
       .post(this.authController.registerNewUser);
 
     this.router.route('/authenticate')
-      .post(this.authController.registerNewUser);
+      .post(this.authController.authenticate);
   }
 }
 

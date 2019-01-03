@@ -1,11 +1,9 @@
 import app from './App';
-import { CONFIG, dataBaseConnect } from './config';
+import { CONFIG } from './config';
 
-dataBaseConnect();
-
-app.listen(CONFIG.PORT, (err: Error) => {
+app.listen(CONFIG.port, (err: Error) => {
   if (err) {
     return console.log(err);
   }
-  console.log(`Server is listening on ${CONFIG.PORT}`);
+  console.log(`Server is listening on ${CONFIG.port}`);
 });
