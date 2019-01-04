@@ -5,18 +5,11 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "better-npm-run dev",
-    "debug": "better-npm-run debug"
+    "dev": "better-npm-run dev"
   },
   "betterScripts": {
     "dev": {
       "command": "ts-node ./src/index.ts",
-      "env": {
-        "NODE_PATH": "src/"
-      }
-    },
-    "debug": {
-      "command": "ts-node --nolazy --inspect-brk ./src/index.ts",
       "env": {
         "NODE_PATH": "src/"
       }
@@ -60,6 +53,7 @@
     "mongoose": "^5.4.0",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
-    "passport-jwt": "^4.0.0"
+    "passport-jwt": "^4.0.0",
+    "ts-node": "^7.0.1"
   }
 }
