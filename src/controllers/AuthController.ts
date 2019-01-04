@@ -55,16 +55,10 @@ export default class AuthController {
             .status(httpStatus.NOT_FOUND)
             .send(getNullErrorData('User not found'));
         }
-        const isPassMatch = user.comparePassword(body.password);
-        if (!isPassMatch) {
+        if (!user.comparePassword(body.password)) {
           return response
             .status(httpStatus.BAD_REQUEST)
             .send(getNullErrorData('Wrong password'));
-        }
-        if (isPassMatch instanceof Error) {
-          return response
-            .status(httpStatus.INTERNAL_SERVER_ERROR)
-            .send(getNullErrorData('Server error'));
         }
         response
           .status(httpStatus.OK)

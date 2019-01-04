@@ -14,8 +14,9 @@ export default class UserController {
       response
         .status(httpStatus.OK)
         .send({
-          data: users.forEach(u => u.toJSON()),
-        });
+          data: users,
+        })
+        .json();
     });
   }
 

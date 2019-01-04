@@ -2,7 +2,6 @@ import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { NextFunction } from 'express';
-import { to } from 'await-to-js';
 import { IUser } from 'shared/types/models';
 import { CONFIG } from 'config';
 
@@ -41,16 +40,14 @@ export const UserSchema = new Schema({
 /**
  * Password hash middleware.
  */
-UserSchema.pre('save', async function preSave(next: NextFunction) {
-  // tslint:disable-next-line:no-this-assignment
-  const user = this;
-  if (!user.isModified('password')) { return next(); }
+UserSchema.pre('save', function preSave(next: NextFunction) {
+  if (!this.isModified('password')) { return next(); }
   try {
-    await bcrypt.genSalt(SALT_ROUND, (err, salt) => {
+    bcrypt.genSalt(SALT_ROUND, (err, salt) => {
       if (err) { return next(err); }
-      bcrypt.hash(user.password, salt, (error, hash) => {
+      bcrypt.hash(this.password, salt, (error, hash) => {
         if (error) { return next(error); }
-        user.password = hash;
+        this.password = hash;
         next();
       });
     });
@@ -62,10 +59,8 @@ UserSchema.pre('save', async function preSave(next: NextFunction) {
 /**
  * Helper method for validating user's password.
  */
-UserSchema.methods.comparePassword = async function compare(pwd: string) {
-  const [error, isMatch] = await to<boolean, Error>(bcrypt.compare(pwd, this.password));
-  if (error) { return error; }
-  return isMatch;
+UserSchema.methods.comparePassword = function compare(pwd: string) {
+  return bcrypt.compareSync(pwd, this.password);
 };
 
 /**
