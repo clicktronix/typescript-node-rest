@@ -1,10 +1,14 @@
 import * as dotenv from 'dotenv';
 
+/**
+ * Load environment variables from .env file, where API keys and passwords are configured.
+ */
 dotenv.config();
 
 export const CONFIG: Record<string, string> = {
   app: process.env.APP || 'dev',
-  port: process.env.PORT || '3000',
+  host: process.env.HOST || '0.0.0.0',
+  port: process.env.PORT || '8080',
   db_dialect: process.env.DB_DIALECT || 'mongo',
   db_host: process.env.DB_HOST || 'localhost',
   db_port: process.env.DB_PORT || '27017',

@@ -1,34 +1,75 @@
 import * as mongoose from 'mongoose';
-const validate = require('mongoose-validator');
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
+import { NextFunction } from 'express';
+import { IUser } from 'shared/types/models';
+import { CONFIG } from 'config';
 
 const Schema = mongoose.Schema;
+const SALT_ROUND = 10;
 
 export const UserSchema = new Schema({
-  first: { type: String },
-  last: { type: String },
-  phone: {
+  firstName: {
     type: String,
-    lowercase: true,
+    required: true,
     trim: true,
-    unique: true,
-    sparse: true,
-    validate: [validate({
-      validator: 'isNumeric',
-      arguments: [7, 20],
-      message: 'Not a valid phone number.',
-    })],
+  },
+  lastName: {
+    type: String,
+    required: true,
   },
   email: {
     type: String,
-    lowercase: true,
-    trim: true,
     unique: true,
-    sparse: true,
-    validate: [validate({
-      validator: 'isEmail',
-      message: 'Not a valid email.',
-    })],
+    match: /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
+    required: true,
+    trim: true,
   },
-  password: { type: String },
+  password: {
+    type: String,
+    required: true,
+    trim: true,
+  },
 
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    useNestedStrict: true,
+  },
+);
+
+/**
+ * Password hash middleware.
+ */
+UserSchema.pre('save', function preSave(next: NextFunction) {
+  if (!this.isModified('password')) { return next(); }
+  try {
+    bcrypt.genSalt(SALT_ROUND, (err, salt) => {
+      if (err) { return next(err); }
+      bcrypt.hash(this.password, salt, (error, hash) => {
+        if (error) { return next(error); }
+        this.password = hash;
+        next();
+      });
+    });
+  } catch (error) {
+    return error;
+  }
+});
+
+/**
+ * Helper method for validating user's password.
+ */
+UserSchema.methods.comparePassword = function compare(pwd: string) {
+  return bcrypt.compareSync(pwd, this.password);
+};
+
+/**
+ * Helper method for getting jwt token.
+ */
+UserSchema.methods.getJWT = function createToken() {
+  const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
+  return 'TOKEN' + jwt.sign({ user_id: this._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
+};
+
+const User = mongoose.model<IUser>('User', UserSchema);
+export default User;

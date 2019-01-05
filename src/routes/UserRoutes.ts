@@ -1,23 +1,22 @@
 
-import { Application } from 'express';
-import { UserController } from '../controllers';
+import { Router } from 'express';
+import { default as passport } from 'passport';
+import { UserController } from 'controllers';
 
-export default class UserRouter {
-  public userController: UserController = new UserController();
-  public app: Application;
+class UserRoutes {
+  public router: Router;
+  private userController: UserController = new UserController();
 
-  constructor(app: Application) {
-    this.app = app;
-  }
+  constructor() {
+    this.router = Router();
+    this.router.route('/')
+      .get(this.userController.getUsers);
 
-  public getRoutes() {
-    this.app.route('/users')
-      .get(this.userController.getUsers)
-      .post(this.userController.addNewUser);
-
-    this.app.route('/users/:userId')
-      .get(this.userController.getUserWithId)
-      .put(this.userController.updateUser)
-      .delete(this.userController.deleteUser);
+    this.router.route('/:userId')
+      .get(passport.authenticate('jwt', { session: false }), this.userController.getUserById)
+      .put(passport.authenticate('jwt', { session: false }), this.userController.updateUser)
+      .delete(passport.authenticate('jwt', { session: false }), this.userController.deleteUser);
   }
 }
+
+export const userRoutes = new UserRoutes().router;
