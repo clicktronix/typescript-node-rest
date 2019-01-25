@@ -30,7 +30,7 @@ export const UserSchema = new Schema({
     required: true,
     trim: true,
   },
-
+  tokens: Array,
 }, {
     timestamps: true,
     useNestedStrict: true,
@@ -64,11 +64,11 @@ UserSchema.methods.comparePassword = function compare(pwd: string) {
 };
 
 /**
- * Helper method for getting jwt token.
+ * Helper method for getting json web token.
  */
 UserSchema.methods.getJWT = function createToken() {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
-  return 'TOKEN' + jwt.sign({ user_id: this._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
+  return 'Bearer' + jwt.sign({ user_id: this._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
 };
 
 const User = mongoose.model<IUser>('User', UserSchema);
