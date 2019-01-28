@@ -1,66 +1,61 @@
-import { Request, Response } from 'express';
+import { BaseContext } from 'koa';
 import * as httpStatus from 'http-status';
 
 import User from 'models/userModel';
+import { getNullErrorData } from 'shared/helpers/errorHandler';
 
 export default class UserController {
-  public async getUsers(_request: Request, response: Response) {
+  public async getUsers(ctx: BaseContext) {
     await User.find({}, (error, users) => {
+
       if (error || !users) {
-        return response
-          .status(httpStatus.NOT_FOUND)
-          .send(error);
+        ctx.status = httpStatus.NOT_FOUND;
+        ctx.body = getNullErrorData(error.message);
       }
-      response
-        .status(httpStatus.OK)
-        .send({
-          data: users,
-        })
-        .json();
+      ctx.status = httpStatus.OK;
+      ctx.body = {
+        data: users,
+      };
     });
   }
 
-  public async getUserById(request: Request, response: Response) {
-    await User.findById(request.params.userId, (error, user) => {
+  public async getUserById(ctx: BaseContext) {
+    await User.findById(ctx.request.params.userId, (error, user) => {
       if (error || !user) {
-        return response
-          .status(httpStatus.NOT_FOUND)
-          .send(error);
+        ctx.status = httpStatus.NOT_FOUND;
+        ctx.body = getNullErrorData(error.message);
+        return;
       }
-      response
-        .status(httpStatus.OK)
-        .send({
-          data: user.toJSON(),
-        });
+      ctx.status = httpStatus.OK;
+      ctx.body = {
+        data: user.toJSON(),
+      };
     });
   }
 
-  public async updateUser(request: Request, response: Response) {
-    await User.findOneAndUpdate({ _id: request.params.userId }, request.body, { new: true }, (error, user) => {
+  public async updateUser(ctx: BaseContext) {
+    await User.findOneAndUpdate({ _id: ctx.request.params.userId }, ctx.request.body, { new: true }, (error, user) => {
       if (error || !user) {
-        return response
-          .status(httpStatus.NOT_FOUND)
-          .send(error);
+        ctx.status = httpStatus.NOT_FOUND;
+        ctx.body = getNullErrorData(error.message);
+        return;
       }
-      response
-        .status(httpStatus.OK)
-        .send({
-          data: user.toJSON(),
-        });
+      ctx.status = httpStatus.OK;
+      ctx.body = {
+        data: user.toJSON(),
+      };
     });
   }
 
-  public async deleteUser(request: Request, response: Response) {
-    await User.remove({ _id: request.params.contactId }, (error) => {
+  public async deleteUser(ctx: BaseContext) {
+    await User.remove({ _id: ctx.request.params.contactId }, (error) => {
       if (error) {
-        return response
-          .status(httpStatus.NOT_FOUND)
-          .send(error);
+        ctx.status = httpStatus.NOT_FOUND;
+        ctx.body = getNullErrorData(error.message);
+        return;
       }
-      response
-        .status(httpStatus.OK)
-        .json({ message: 'Successfully deleted user!' })
-        .end();
+      ctx.status = httpStatus.OK;
+      ctx.body = { message: 'Successfully deleted user!' };
     });
   }
 }
