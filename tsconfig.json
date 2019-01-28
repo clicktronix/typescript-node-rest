@@ -32,6 +32,7 @@
     "importHelpers": true,
     "strictPropertyInitialization": true,
     "strictFunctionTypes": false,
+    "emitDecoratorMetadata": true,
   },
   "include": [
     "src/**/*",

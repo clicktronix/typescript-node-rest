@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { BaseContext } from 'koa';
 import * as httpStatus from 'http-status';
 
 import { getNullErrorData } from 'shared/helpers/errorHandler';
@@ -8,27 +8,24 @@ export default class AuthController {
   /**
    * POST /register
    */
-  public async registerNewUser({ body }: Request, response: Response) {
-    const newUser = new User(body);
+  public async registerNewUser(ctx: BaseContext) {
+    const newUser = new User(ctx.request.body);
     try {
       await newUser.save((err, user) => {
         if (err) {
-          return response
-            .status(httpStatus.BAD_REQUEST)
-            .send(getNullErrorData('Email is used.'));
+          ctx.status = httpStatus.BAD_REQUEST;
+          ctx.body = getNullErrorData('Email is used.');
         }
-        response
-          .status(httpStatus.OK)
-          .send({
-            message: 'User registered',
-            token: user.getJWT(),
-            data: user.toJSON(),
-          });
+        ctx.status = httpStatus.OK;
+        ctx.body = {
+          message: 'User registered',
+          token: user.getJWT(),
+          data: user.toJSON(),
+        };
       });
     } catch (err) {
-      response
-        .status(httpStatus.INTERNAL_SERVER_ERROR)
-        .send(getNullErrorData(err.message));
+      ctx.status = httpStatus.INTERNAL_SERVER_ERROR;
+      ctx.body = getNullErrorData(err.message);
     }
   }
 
@@ -36,41 +33,38 @@ export default class AuthController {
    * POST /authenticate
    * Sign in using email and password.
    */
-  public async authenticate({ body }: Request, response: Response) {
+  public async authenticate(ctx: BaseContext) {
+    const { body } = ctx.request;
     try {
       if (!body.email) {
-        return response
-          .status(httpStatus.BAD_REQUEST)
-          .send(getNullErrorData('Please enter an email to login'));
+        ctx.status = httpStatus.BAD_REQUEST;
+        ctx.body = getNullErrorData('Please enter an email to login');
       }
       if (!body.password) {
-        return response
-          .status(httpStatus.BAD_REQUEST)
-          .send(getNullErrorData('Please enter a password to login'));
+        ctx.status = httpStatus.BAD_REQUEST;
+        ctx.body = getNullErrorData('Please enter a password to login');
       }
 
       await User.findOne({ email: body.email }, (err, user) => {
         if (!user || err) {
-          return response
-            .status(httpStatus.NOT_FOUND)
-            .send(getNullErrorData('User not found'));
+          ctx.status = httpStatus.NOT_FOUND;
+          ctx.body = getNullErrorData('User not found');
+          return;
         }
         if (!user.comparePassword(body.password)) {
-          return response
-            .status(httpStatus.BAD_REQUEST)
-            .send(getNullErrorData('Wrong password'));
+          ctx.status = httpStatus.BAD_REQUEST;
+          ctx.body = getNullErrorData('Wrong password');
+          return;
         }
-        response
-          .status(httpStatus.OK)
-          .send({
-            token: user.getJWT(),
-            data: user.toJSON(),
-          });
+        ctx.status = httpStatus.OK;
+        ctx.body = {
+          token: user.getJWT(),
+          data: user.toJSON(),
+        };
       });
     } catch (err) {
-      response
-        .status(httpStatus.INTERNAL_SERVER_ERROR)
-        .send(getNullErrorData(err.message));
+      ctx.status = httpStatus.INTERNAL_SERVER_ERROR;
+      ctx.body = getNullErrorData(err.message);
     }
   }
 }
