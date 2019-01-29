@@ -1,7 +1,6 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { NextFunction } from 'express';
 import { IUser } from 'shared/types/models';
 import { CONFIG } from 'config';
 
@@ -40,14 +39,14 @@ export const UserSchema = new Schema({
 /**
  * Password hash middleware.
  */
-UserSchema.pre('save', function preSave(next: NextFunction) {
+UserSchema.pre('save', (next: mongoose.HookNextFunction) => {
   if (!this.isModified('password')) { return next(); }
   try {
     bcrypt.genSalt(SALT_ROUND, (err, salt) => {
       if (err) { return next(err); }
-      bcrypt.hash(this.password, salt, (error, hash) => {
+      bcrypt.hash((this as any).password, salt, (error, hash) => {
         if (error) { return next(error); }
-        this.password = hash;
+        (this as any).password = hash;
         next();
       });
     });
@@ -59,14 +58,14 @@ UserSchema.pre('save', function preSave(next: NextFunction) {
 /**
  * Helper method for validating user's password.
  */
-UserSchema.methods.comparePassword = function compare(pwd: string) {
+UserSchema.methods.comparePassword = (pwd: string) => {
   return bcrypt.compareSync(pwd, this.password);
 };
 
 /**
  * Helper method for getting jwt token.
  */
-UserSchema.methods.getJWT = function createToken() {
+UserSchema.methods.getJWT = () => {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
   return 'TOKEN' + jwt.sign({ user_id: this._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
 };

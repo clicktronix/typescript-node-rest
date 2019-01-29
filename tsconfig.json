@@ -6,11 +6,8 @@
     "baseUrl": "./src",
     "noImplicitAny": true,
     "moduleResolution": "node",
-    "sourceMap": true,
     "resolveJsonModule": true,
     "outDir": "dist",
-    "inlineSourceMap": true,
-    "inlineSources": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "./node_modules/@types",

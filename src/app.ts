@@ -1,5 +1,6 @@
 import { default as Koa } from 'koa';
 import { default as bodyParser } from 'koa-bodyparser';
+import { default as logger } from 'koa-logger';
 import { default as mongoose } from 'mongoose';
 import { default as chalk } from 'chalk';
 
@@ -24,6 +25,7 @@ class App {
   private setMiddlewares(): void {
     this.app.use(bodyParser());
     this.app.use(router.routes()).use(router.allowedMethods());
+    this.app.use(logger());
   }
 
   private dbConnect(): void {
