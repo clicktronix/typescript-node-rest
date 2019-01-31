@@ -46,11 +46,7 @@ describe('Auth module', () => {
       });
 
       expect(res.status).to.equal(403);
-      expect(res.body).to.deep.equal({
-        success: false,
-        message: 'Wrong password',
-        data: null,
-      });
+      expect(res.error.message).to.be.an('string');
     });
 
     it('Should return 404 not found, if user does not exist', async () => {
@@ -60,11 +56,7 @@ describe('Auth module', () => {
       });
 
       expect(res.status).to.equal(404);
-      expect(res.body).to.deep.equal({
-        success: false,
-        message: 'User not found',
-        data: null,
-      });
+      expect(res.error.message).to.be.an('string');
     });
 
     it('Should return 403 forbidden, if email is empty', async () => {
@@ -73,11 +65,7 @@ describe('Auth module', () => {
       });
 
       expect(res.status).to.equal(403);
-      expect(res.body).to.deep.equal({
-        success: false,
-        message: 'Please enter an email to login',
-        data: null,
-      });
+      expect(res.error.message).to.be.an('string');
     });
 
     it('Should return 403 forbidden, if password is empty', async () => {
@@ -86,28 +74,29 @@ describe('Auth module', () => {
       });
 
       expect(res.status).to.equal(403);
-      expect(res.body).to.deep.equal({
-        success: false,
-        message: 'Please enter a password to login',
-        data: null,
-      });
+      expect(res.error.message).to.be.an('string');
     });
   });
 
-  // describe('/register', () => {
-  //   it('Should return 403 forbidden, if email is used', async () => {
-  //     const res = await server.post('/register').send({
-  //       ...userRequest,
-  //       firstName: 'firstName',
-  //       lastName: 'lastName',
-  //     });
+  describe('/register', () => {
+    it('Should throw error when register exists user', async () => {
+      const res = await server.post('/register').send(userRequest);
 
-  //     expect(res.status).to.equal(403);
-  //     expect(res.body).to.deep.equal({
-  //       message: 'Email is used.',
-  //       success: false,
-  //       data: null,
-  //     });
-  //   });
-  // });
+      expect(res.status).to.equal(403);
+      expect(res.error.message).to.be.an('string');
+    });
+
+    it('Should register new user', async () => {
+      const res = await server.post('/register').send({
+        email: 'newEmail123@gmail.com',
+        password: '123',
+        firstName: 'firstName',
+        lastName: 'lastName',
+      });
+
+      expect(res.status).to.equal(200);
+      expect(res.body.message).to.equal('User registered');
+      await server.delete(`/users/${res.body.data._id}`);
+    });
+  });
 });

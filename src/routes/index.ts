@@ -13,7 +13,7 @@ router.post('/authenticate', authController.authenticate);
 // User routes
 router.get('/users', userController.getUsers);
 router.get('/users/:userId', userController.getUserById);
-router.put('/users/:userId', userController.updateUser);
+router.put('/users', userController.updateUser);
 router.delete('/users/:userId', userController.deleteUser);
 
 export { router };
