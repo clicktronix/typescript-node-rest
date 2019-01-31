@@ -42,7 +42,7 @@ describe('User module', () => {
       expect(res.body.data).to.deep.equal(userResponseData);
     });
 
-    it('Should return error if user is not exist', async () => {
+    it('Should return error if user does not exist', async () => {
       const res = await server.get('/users/123');
 
       expect(res.status).to.equal(500);
@@ -56,7 +56,7 @@ describe('User module', () => {
       expect(res.body.data).to.deep.equal(userResponseData);
     });
 
-    it('Should return error if user is not exist, when it updating', async () => {
+    it('Should return error if user does not exist, when it updating', async () => {
       const res = await server.put('/users').send({
         ...userResponseData,
         email: '123@mail.ru',
@@ -79,7 +79,7 @@ describe('User module', () => {
       expect(res.body.message).to.be.an('string');
     });
 
-    it('Should throw error if deleting user is not exist', async () => {
+    it('Should throw error if the user being deleted does not exist', async () => {
       const res = await server.delete(`/users/123`);
 
       expect(res.status).to.equal(500);

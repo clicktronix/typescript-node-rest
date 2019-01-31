@@ -49,7 +49,7 @@ describe('Auth module', () => {
       expect(res.error.message).to.be.an('string');
     });
 
-    it('Should return 404 not found, if user does not exist', async () => {
+    it('Should return 404, if user does not exist', async () => {
       const res = await server.post('/authenticate').send({
         ...userRequest,
         email: 'INVALID',
@@ -59,7 +59,7 @@ describe('Auth module', () => {
       expect(res.error.message).to.be.an('string');
     });
 
-    it('Should return 403 forbidden, if email is empty', async () => {
+    it('Should return 403, if email is empty', async () => {
       const res = await server.post('/authenticate').send({
         password: '123',
       });
@@ -68,7 +68,7 @@ describe('Auth module', () => {
       expect(res.error.message).to.be.an('string');
     });
 
-    it('Should return 403 forbidden, if password is empty', async () => {
+    it('Should return 403, if password is empty', async () => {
       const res = await server.post('/authenticate').send({
         email: 'mail',
       });
