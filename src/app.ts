@@ -38,4 +38,5 @@ class App {
   }
 }
 
+export { App };
 export default new App().app;

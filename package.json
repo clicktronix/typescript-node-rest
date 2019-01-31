@@ -6,11 +6,18 @@
   "scripts": {
     "build": "tsc",
     "dev": "better-npm-run dev",
-    "test": "node_modules/.bin/mocha --require ts-node/register tests/**/*.ts"
+    "test": "better-npm-run test",
+    "check-types": "node_modules/.bin/tsc -p . --noEmit -w"
   },
   "betterScripts": {
     "dev": {
-      "command": "nodemon -e ts -w ./src -x ts-node ./src/index.ts",
+      "command": "nodemon -e ts -w ./src -x ts-node ./src/index.ts ./test/*",
+      "env": {
+        "NODE_PATH": "src/"
+      }
+    },
+    "test": {
+      "command": "node_modules/.bin/mocha --require ts-node/register tests/**/*.ts",
       "env": {
         "NODE_PATH": "src/"
       }
@@ -38,7 +45,7 @@
     "@types/koa-bodyparser": "^4.2.1",
     "@types/koa-logger": "^3.1.1",
     "@types/koa-router": "^7.0.39",
-    "@types/mongoose": "^5.3.10",
+    "@types/mongoose": "^5.3.11",
     "bcrypt": "^3.0.3",
     "better-npm-run": "^0.1.1",
     "chalk": "^2.4.2",
@@ -49,8 +56,8 @@
     "koa-bodyparser": "^4.2.1",
     "koa-logger": "^3.2.0",
     "koa-router": "^7.4.0",
-    "mongoose": "^5.4.7",
-    "supertest-koa-agent": "^0.3.0",
+    "mongoose": "^5.4.8",
+    "supertest-koa-agent": "^0.3.2",
     "ts-node": "^7.0.1"
   }
 }

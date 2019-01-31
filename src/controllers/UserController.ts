@@ -1,16 +1,14 @@
 import { BaseContext } from 'koa';
 import * as httpStatus from 'http-status';
 
-import User from 'models/userModel';
-import { getNullErrorData } from 'shared/helpers/errorHandler';
+import { User } from 'models/userModel';
 
 export default class UserController {
   public async getUsers(ctx: BaseContext) {
-    await User.find({}, (error, users) => {
+    await User.find({}, (err, users) => {
 
-      if (error || !users) {
-        ctx.status = httpStatus.NOT_FOUND;
-        ctx.body = getNullErrorData(error.message);
+      if (err || !users) {
+        ctx.throw(httpStatus.NOT_FOUND, err.message, { data: null });
       }
       ctx.status = httpStatus.OK;
       ctx.body = {
@@ -20,10 +18,9 @@ export default class UserController {
   }
 
   public async getUserById(ctx: BaseContext) {
-    await User.findById(ctx.request.params.userId, (error, user) => {
-      if (error || !user) {
-        ctx.status = httpStatus.NOT_FOUND;
-        ctx.body = getNullErrorData(error.message);
+    await User.findById(ctx.request.ctx.params.userId, (err, user) => {
+      if (err || !user) {
+        ctx.throw(httpStatus.NOT_FOUND, err.message, { data: null });
         return;
       }
       ctx.status = httpStatus.OK;
@@ -34,10 +31,10 @@ export default class UserController {
   }
 
   public async updateUser(ctx: BaseContext) {
-    await User.findOneAndUpdate({ _id: ctx.request.params.userId }, ctx.request.body, { new: true }, (error, user) => {
-      if (error || !user) {
-        ctx.status = httpStatus.NOT_FOUND;
-        ctx.body = getNullErrorData(error.message);
+    const { request } = ctx;
+    await User.findOneAndUpdate({ _id: request.ctx.params.userId }, request.body, { new: true }, (err, user) => {
+      if (err || !user) {
+        ctx.throw(httpStatus.NOT_FOUND, err.message, { data: null });
         return;
       }
       ctx.status = httpStatus.OK;
@@ -48,10 +45,9 @@ export default class UserController {
   }
 
   public async deleteUser(ctx: BaseContext) {
-    await User.remove({ _id: ctx.request.params.contactId }, (error) => {
-      if (error) {
-        ctx.status = httpStatus.NOT_FOUND;
-        ctx.body = getNullErrorData(error.message);
+    await User.deleteOne({ _id: ctx.request.ctx.params.userId }, (err) => {
+      if (err) {
+        ctx.throw(httpStatus.NOT_FOUND, err.message, { data: null });
         return;
       }
       ctx.status = httpStatus.OK;
