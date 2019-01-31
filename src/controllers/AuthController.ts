@@ -32,13 +32,8 @@ export default class AuthController {
   public async authenticate(ctx: BaseContext) {
     const { body } = ctx.request;
     try {
-      if (!body.email) {
-        ctx.throw(httpStatus.FORBIDDEN, 'Please enter an email to login');
-        return;
-      }
-      if (!body.password) {
-        ctx.throw(httpStatus.FORBIDDEN, 'Please enter a password to login');
-        return;
+      if (!body.email || !body.password) {
+        ctx.throw(httpStatus.FORBIDDEN, 'Please fill in your credentials');
       }
       const user = await User.findOne({ email: body.email });
       if (!user) {
@@ -47,7 +42,6 @@ export default class AuthController {
       }
       if (!user.comparePassword(body.password)) {
         ctx.throw(httpStatus.FORBIDDEN, 'Wrong password');
-        return;
       }
       ctx.status = httpStatus.OK;
       ctx.body = {
