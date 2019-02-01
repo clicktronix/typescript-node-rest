@@ -1,8 +1,7 @@
 import { expect } from 'chai';
-import { App } from '../src/app';
+import { default as app } from '../src/app';
 const agent = require('supertest-koa-agent');
 
-const app = new App().app;
 const userResponseData = {
   '_id': '5c2fae70baade40ee5982dc3',
   'firstName': 'Vladislav',

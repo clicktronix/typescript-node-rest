@@ -1,8 +1,8 @@
 import { expect } from 'chai';
-import { App } from '../src/app';
+import { default as app } from '../src/app';
 const agent = require('supertest-koa-agent');
 
-const app = new App().app;
+// const app = new App().app;
 const userRequest = {
   email: 'asdfg@gmail.com',
   password: '23031994',
