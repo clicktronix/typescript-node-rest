@@ -1,30 +1,24 @@
 import { expect } from 'chai';
+import { Server } from 'http';
 import { default as app } from '../src/app';
 const agent = require('supertest-koa-agent');
 
-// const app = new App().app;
 const userRequest = {
+  firstName: 'Vladislav',
+  lastName: 'Manakov',
   email: 'asdfg@gmail.com',
-  password: '23031994',
-};
-const userResponseData = {
-  '_id': '5c2fae70baade40ee5982dc3',
-  'firstName': 'Vladislav',
-  'lastName': 'Manakov',
-  'email': 'asdfg@gmail.com',
-  'password': '$2b$10$L34AyEt4Wd0kx4J7FOTUz.b9Oo3hMhxl9Kc2DQCEKGAQKzPQoiPCq',
-  'createdAt': '2019-01-04T19:05:20.650Z',
-  'updatedAt': '2019-01-04T19:05:20.650Z',
-  '__v': 0,
+  password: '123',
 };
 
 describe('Auth module', () => {
   let server: any;
-  let appInstance: any;
+  let appInstance: Server;
+  let userResponseData: any;
 
-  before(() => {
+  before(async () => {
     appInstance = app.listen(8080);
     server = agent(app);
+    userResponseData = await server.post('/register').send(userRequest);
   });
 
   after(() => {
@@ -36,7 +30,7 @@ describe('Auth module', () => {
       const res = await server.post('/authenticate').send(userRequest);
 
       expect(res.status).to.equal(200);
-      expect(res.body.data).to.deep.equal(userResponseData);
+      expect(res.body.data).to.deep.equal(userResponseData.body.data);
     });
 
     it('Should return 403 forbidden, if password is wrong', async () => {
