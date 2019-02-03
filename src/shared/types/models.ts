@@ -1,6 +1,13 @@
-import * as mongoose from 'mongoose';
+import { Document } from 'mongoose';
 
-export interface IUser extends mongoose.Document {
+export interface IUser {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  password?: string;
+}
+
+export interface IUserModel extends IUser, Document {
   comparePassword(pwd: string): boolean;
   getJWT(): string;
 }

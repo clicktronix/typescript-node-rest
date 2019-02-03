@@ -1,14 +1,13 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { NextFunction } from 'express';
-import { IUser } from 'shared/types/models';
+import { IUserModel } from 'shared/types/models';
 import { CONFIG } from 'config';
 
 const Schema = mongoose.Schema;
 const SALT_ROUND = 10;
 
-export const UserSchema = new Schema({
+export const UserSchema = new Schema<IUserModel>({
   firstName: {
     type: String,
     required: true,
@@ -30,7 +29,6 @@ export const UserSchema = new Schema({
     required: true,
     trim: true,
   },
-
 }, {
     timestamps: true,
     useNestedStrict: true,
@@ -40,14 +38,14 @@ export const UserSchema = new Schema({
 /**
  * Password hash middleware.
  */
-UserSchema.pre('save', function preSave(next: NextFunction) {
+UserSchema.pre('save', function pre(next: mongoose.HookNextFunction) {
   if (!this.isModified('password')) { return next(); }
   try {
     bcrypt.genSalt(SALT_ROUND, (err, salt) => {
       if (err) { return next(err); }
-      bcrypt.hash(this.password, salt, (error, hash) => {
+      bcrypt.hash((this as IUserModel).password, salt, (error, hash) => {
         if (error) { return next(error); }
-        this.password = hash;
+        (this as IUserModel).password = hash;
         next();
       });
     });
@@ -66,10 +64,9 @@ UserSchema.methods.comparePassword = function compare(pwd: string) {
 /**
  * Helper method for getting jwt token.
  */
-UserSchema.methods.getJWT = function createToken() {
+UserSchema.methods.getJWT = function getToken() {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
   return 'TOKEN' + jwt.sign({ user_id: this._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
 };
 
-const User = mongoose.model<IUser>('User', UserSchema);
-export default User;
+export const User = mongoose.model<IUserModel>('User', UserSchema);
