@@ -4,6 +4,7 @@ import { default as MongoMemoryServer } from 'mongodb-memory-server';
 import { CONFIG } from 'config';
 
 export class DataBase {
+  private mongod: MongoMemoryServer | null = null;
   private mongoUrl = 'mongodb://' + CONFIG.db_user + ':' + CONFIG.db_password + '@'
     + CONFIG.db_host + ':' + CONFIG.db_port + '/' + CONFIG.db_name;
   private mongoOptions = {
@@ -13,8 +14,8 @@ export class DataBase {
 
   public connect() {
     if (process.env.NODE_ENV === 'test') {
-      const mongod = new MongoMemoryServer();
-      mongod.getConnectionString().then((mongoUri) => {
+      this.mongod = new MongoMemoryServer();
+      this.mongod.getConnectionString().then((mongoUri) => {
         mongoose.connect(mongoUri, {
           ...this.mongoOptions,
           autoReconnect: true,
@@ -31,7 +32,7 @@ export class DataBase {
       mongoose.connect(this.mongoUrl, this.mongoOptions);
       mongoose.connection.on('error', (err) => {
         console.error(err);
-        console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+        console.log('MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
         process.exit();
       });
     }

@@ -52,11 +52,7 @@ export default class UserController {
 
   public async deleteUser(ctx: BaseContext) {
     try {
-      const user = await User.deleteOne({ _id: ctx.request.ctx.params.userId });
-      if (!user) {
-        ctx.throw(httpStatus.NOT_FOUND, 'User not found');
-        return;
-      }
+      await User.deleteOne({ _id: ctx.request.ctx.params.userId });
       ctx.status = httpStatus.OK;
       ctx.body = { message: 'Successfully deleted user!' };
     } catch (err) {
