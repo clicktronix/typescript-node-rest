@@ -1,6 +1,9 @@
 import { expect } from 'chai';
 import { Server } from 'http';
+import * as httpStatus from 'http-status';
+
 import { default as app } from '../src/app';
+
 const agent = require('supertest-koa-agent');
 
 const userRequest = {
