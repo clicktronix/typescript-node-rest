@@ -42,10 +42,10 @@ jspm_packages
 # Other
 build
 static
-.env
 
 # MacOS deps
 .DS_Store
+*.env
 
 # app extra files
 dist

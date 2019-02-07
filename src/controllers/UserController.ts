@@ -42,7 +42,7 @@ export default class UserController {
       }
       ctx.status = httpStatus.OK;
       ctx.body = {
-        message: 'User registered',
+        message: 'User updated',
         data: user.toJSON(),
       };
     } catch (err) {
@@ -54,7 +54,7 @@ export default class UserController {
     try {
       await User.deleteOne({ _id: ctx.request.ctx.params.userId });
       ctx.status = httpStatus.OK;
-      ctx.body = { message: 'Successfully deleted user!' };
+      ctx.body = { message: 'Successfully deleted user' };
     } catch (err) {
       ctx.throw(err.status, err.message);
     }

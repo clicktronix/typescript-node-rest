@@ -1,5 +1,4 @@
 import { default as mongoose } from 'mongoose';
-import { default as chalk } from 'chalk';
 import { default as MongoMemoryServer } from 'mongodb-memory-server';
 import { CONFIG } from 'config';
 
@@ -10,6 +9,7 @@ export class DataBase {
   private mongoOptions = {
     useNewUrlParser: true,
     useCreateIndex: true,
+    useFindAndModify: false,
   };
 
   public connect() {
@@ -20,19 +20,15 @@ export class DataBase {
           ...this.mongoOptions,
           autoReconnect: true,
         });
-        mongoose.connection.on('error', (e) => {
-          console.log(e);
+        mongoose.connection.on('error', err => {
+          console.log(err);
           process.exit();
-        });
-        mongoose.connection.once('open', () => {
-          console.log(`MongoDB successfully connected to ${mongoUri}`);
         });
       });
     } else {
       mongoose.connect(this.mongoUrl, this.mongoOptions);
-      mongoose.connection.on('error', (err) => {
+      mongoose.connection.on('error', err => {
         console.error(err);
-        console.log('MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
         process.exit();
       });
     }
