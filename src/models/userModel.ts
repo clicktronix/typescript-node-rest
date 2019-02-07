@@ -46,40 +46,35 @@ export const UserSchema = new Schema<IUserModel>({
 /**
  * Password hash middleware
  */
-UserSchema.pre('save', function pre(next: mongoose.HookNextFunction) {
-  if (!this.isModified('password')) { return next(); }
+UserSchema.pre('save', async function() {
+  if (!this.isModified('password')) { return; }
   try {
-    bcrypt.genSalt(SALT_ROUND, (err, salt) => {
-      if (err) { return next(err); }
-      bcrypt.hash((this as IUserModel).password, salt, (error, hash) => {
-        if (error) { return next(error); }
-        (this as IUserModel).password = hash;
-        next();
-      });
-    });
-  } catch (error) {
-    return error;
+    const salt = await bcrypt.genSalt(SALT_ROUND);
+    const hash = await bcrypt.hash((this as IUserModel).password, salt);
+    (this as IUserModel).password = hash;
+  } catch (err) {
+    return err;
   }
 });
 
 /**
  * Helper method for validating user's password
  */
-UserSchema.methods.comparePassword = function compare(pwd: string) {
+UserSchema.methods.comparePassword = function(pwd: string) {
   return bcrypt.compareSync(pwd, this.password);
 };
 
 /**
  * Get full name method
  */
-UserSchema.virtual('fullName').get(function getFullName() {
+UserSchema.virtual('fullName').get(function() {
   return this.name.first + ' ' + this.name.last;
 });
 
 /**
  * Helper method for getting jwt token
  */
-UserSchema.methods.getJWT = function getToken() {
+UserSchema.methods.getJWT = function() {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
   return 'TOKEN' + jwt.sign({ user_id: this._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
 };
