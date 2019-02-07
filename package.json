@@ -48,6 +48,7 @@
     "@types/koa-bodyparser": "^4.2.1",
     "@types/koa-router": "^7.0.39",
     "@types/mongoose": "^5.3.12",
+    "@types/ramda": "^0.25.48",
     "bcrypt": "^3.0.3",
     "better-npm-run": "^0.1.1",
     "chalk": "^2.4.2",
@@ -58,6 +59,7 @@
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
     "mongoose": "^5.4.9",
+    "ramda": "^0.26.1",
     "supertest-koa-agent": "^0.3.2",
     "ts-node": "^7.0.1"
   }

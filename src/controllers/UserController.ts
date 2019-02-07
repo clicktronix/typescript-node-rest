@@ -4,6 +4,9 @@ import * as httpStatus from 'http-status';
 import { User } from 'models/userModel';
 
 export default class UserController {
+  /**
+   * GET /users
+   */
   public async getUsers(ctx: BaseContext) {
     try {
       const users = await User.find({});
@@ -16,6 +19,9 @@ export default class UserController {
     }
   }
 
+  /**
+   * GET /users/:userId
+   */
   public async getUserById(ctx: BaseContext) {
     try {
       const user = await User.findById(ctx.request.ctx.params.userId);
@@ -32,6 +38,9 @@ export default class UserController {
     }
   }
 
+  /**
+   * PUT /users
+   */
   public async updateUser(ctx: BaseContext) {
     const { request } = ctx;
     try {
@@ -42,7 +51,7 @@ export default class UserController {
       }
       ctx.status = httpStatus.OK;
       ctx.body = {
-        message: 'User registered',
+        message: 'User updated',
         data: user.toJSON(),
       };
     } catch (err) {
@@ -50,11 +59,14 @@ export default class UserController {
     }
   }
 
+  /**
+   * DELETE /users/:userId
+   */
   public async deleteUser(ctx: BaseContext) {
     try {
       await User.deleteOne({ _id: ctx.request.ctx.params.userId });
       ctx.status = httpStatus.OK;
-      ctx.body = { message: 'Successfully deleted user!' };
+      ctx.body = { message: 'Successfully deleted user' };
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
