@@ -45,6 +45,7 @@ static
 
 # MacOS deps
 .DS_Store
+*.env
 
 # app extra files
 dist

@@ -1,1 +1,1 @@
-declare module 'mongoose-validator';
+declare module 'supertest-koa-agent';

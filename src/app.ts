@@ -1,61 +1,25 @@
-import { default as express } from 'express';
-import { default as logger } from 'morgan';
-import { default as cors } from 'cors';
-import { default as mongoose } from 'mongoose';
-import { default as chalk } from 'chalk';
-import { default as errorHandler } from 'errorhandler';
-import * as bodyParser from 'body-parser';
+import { default as Koa } from 'koa';
+import { default as bodyParser } from 'koa-bodyparser';
 
-import { CONFIG } from './config';
 import { router } from './routes';
+import { DataBase } from './data';
 
 class App {
-  public app: express.Application;
-  private corsOptions: cors.CorsOptions = {
-    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Access-Token'],
-    credentials: true,
-    methods: 'GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE',
-    preflightContinue: true,
-    optionsSuccessStatus: 200,
-  };
-  private mongoUrl = 'mongodb://' + CONFIG.db_user + ':' + CONFIG.db_password + '@'
-    + CONFIG.db_host + ':' + CONFIG.db_port + '/' + CONFIG.db_name;
-  private mongoOptions = {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-  };
+  public app: Koa;
+  private db: DataBase;
 
   constructor() {
-    this.app = express();
+    this.app = new Koa();
+    this.db = new DataBase();
     this.setMiddlewares();
-    this.dbConnect();
-    this.catchErrors();
+    this.db.connect();
   }
 
   private setMiddlewares(): void {
-    this.app.set('host', CONFIG.host);
-    this.app.set('port', CONFIG.port);
-    this.app.use(logger('dev'));
-    this.app.use(cors(this.corsOptions));
-    this.app.use(bodyParser.urlencoded({ extended: false }));
-    this.app.use(bodyParser.json({ limit: '50mb' }));
-    this.app.use('/', router);
-  }
-
-  private dbConnect(): void {
-    mongoose.connect(this.mongoUrl, this.mongoOptions);
-    mongoose.connection.on('error', (err) => {
-      console.error(err);
-      console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
-      process.exit();
-    });
-  }
-
-  private catchErrors(): void {
-    if (CONFIG.app === 'dev') {
-      this.app.use(errorHandler());
-    }
+    this.app.use(bodyParser());
+    this.app.use(router.routes()).use(router.allowedMethods());
   }
 }
 
+export { App };
 export default new App().app;

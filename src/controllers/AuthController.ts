@@ -1,76 +1,51 @@
-import { Request, Response } from 'express';
+import { BaseContext } from 'koa';
 import * as httpStatus from 'http-status';
+import * as R from 'ramda';
 
-import { getNullErrorData } from 'shared/helpers/errorHandler';
-import User from 'models/userModel';
+import { User } from 'models/userModel';
 
 export default class AuthController {
   /**
    * POST /register
    */
-  public async registerNewUser({ body }: Request, response: Response) {
-    const newUser = new User(body);
+  public async registerNewUser(ctx: BaseContext) {
+    const { body } = ctx.request;
     try {
-      await newUser.save((err, user) => {
-        if (err) {
-          return response
-            .status(httpStatus.BAD_REQUEST)
-            .send(getNullErrorData('Email is used.'));
-        }
-        response
-          .status(httpStatus.OK)
-          .send({
-            message: 'User registered',
-            token: user.getJWT(),
-            data: user.toJSON(),
-          });
-      });
+      const newUser = new User(body);
+      if (await User.findOne({ email: body.email })) {
+        ctx.throw(httpStatus.FORBIDDEN, 'Email is used');
+      }
+      await newUser.save();
+      ctx.status = httpStatus.OK;
+      ctx.body = {
+        message: 'User successfully registered',
+      };
     } catch (err) {
-      response
-        .status(httpStatus.INTERNAL_SERVER_ERROR)
-        .send(getNullErrorData(err.message));
+      ctx.throw(err.status, err.message);
     }
   }
 
   /**
    * POST /authenticate
-   * Sign in using email and password.
+   * Sign in using email and password
    */
-  public async authenticate({ body }: Request, response: Response) {
+  public async authenticate(ctx: BaseContext) {
+    const { body } = ctx.request;
     try {
-      if (!body.email) {
-        return response
-          .status(httpStatus.BAD_REQUEST)
-          .send(getNullErrorData('Please enter an email to login'));
+      const user = await User.findOne({ email: body.email }).select('+password');
+      if (!user) {
+        ctx.throw(httpStatus.NOT_FOUND, 'User not found');
+        return;
       }
-      if (!body.password) {
-        return response
-          .status(httpStatus.BAD_REQUEST)
-          .send(getNullErrorData('Please enter a password to login'));
+      if (!user.comparePassword(body.password)) {
+        ctx.throw(httpStatus.FORBIDDEN, 'Wrong password');
       }
-
-      await User.findOne({ email: body.email }, (err, user) => {
-        if (!user || err) {
-          return response
-            .status(httpStatus.NOT_FOUND)
-            .send(getNullErrorData('User not found'));
-        }
-        if (!user.comparePassword(body.password)) {
-          return response
-            .status(httpStatus.BAD_REQUEST)
-            .send(getNullErrorData('Wrong password'));
-        }
-        response
-          .status(httpStatus.OK)
-          .send({
-            token: user.getJWT(),
-            data: user.toJSON(),
-          });
-      });
+      ctx.status = httpStatus.OK;
+      ctx.body = {
+        data: R.omit(['password'], user.toJSON()),
+      };
     } catch (err) {
-      response
-        .status(httpStatus.INTERNAL_SERVER_ERROR)
-        .send(getNullErrorData(err.message));
+      ctx.throw(err.status, err.message);
     }
   }
 }
