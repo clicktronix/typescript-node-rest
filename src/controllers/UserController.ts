@@ -26,8 +26,7 @@ export default class UserController {
     try {
       const user = await User.findById(ctx.request.ctx.params.userId);
       if (!user) {
-        ctx.throw(httpStatus.NOT_FOUND, 'User not found');
-        return;
+        return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
       ctx.status = httpStatus.OK;
       ctx.body = {
@@ -46,8 +45,7 @@ export default class UserController {
     try {
       const user = await User.findOneAndUpdate({ email: request.body.email }, request.body, { new: true });
       if (!user) {
-        ctx.throw(httpStatus.NOT_FOUND, 'User not found');
-        return;
+        return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
       ctx.status = httpStatus.OK;
       ctx.body = {

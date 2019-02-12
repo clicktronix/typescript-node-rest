@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { Server } from 'http';
 import * as httpStatus from 'http-status';
+import * as R from 'ramda';
 
 import { default as app } from '../src/app';
 
@@ -38,7 +39,9 @@ describe('Auth module', () => {
       const res = await server.post('/authenticate').send(userRequest);
 
       expect(res.status).to.equal(httpStatus.OK);
-      expect(res.body.data).to.deep.equal(userResponseData.body.data);
+      expect(R.omit(['updatedAt'], res.body.data)).to.deep.equal(R.omit(['updatedAt'], userResponseData.body.data));
+      expect(res.body.token.accessToken).to.be.an('string');
+      expect(res.body.token.refreshToken).to.be.an('string');
     });
 
     it('Should return 403, if password is wrong', async () => {
@@ -78,6 +81,48 @@ describe('Auth module', () => {
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
       expect(res.error.message).to.be.an('string');
     });
+
+    it('Should return 401 on expired token', async () => {
+      const res = await server
+        .get('/users')
+        .set('Authorization', userResponseData.body.token.accessToken);
+
+      await setTimeout(() => {
+        expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
+      }, 5000);
+    });
+  });
+
+  describe('/authenticate/refresh', () => {
+    it('Should set new access token using refresh token', async () => {
+      const user = await server.post('/authenticate').send(userRequest);
+      const res = await server
+        .post('/authenticate/refresh')
+        .send({
+          email: user.body.data.email,
+          refreshToken: user.body.token.refreshToken,
+        });
+
+      expect(res.status).to.equal(httpStatus.OK);
+      expect(res.body.token.accessToken).to.be.an('string');
+      expect(res.body.token.refreshToken).to.be.an('string');
+    });
+
+    it('Should return 403 on invalid refresh token', async () => {
+      const user = await server.post('/authenticate').send(userRequest);
+      const res = await server
+        .post('/authenticate/refresh')
+        .send({
+          email: user.body.data.email,
+          refreshToken: 'INVALID',
+        });
+
+      expect(res.status).to.equal(httpStatus.FORBIDDEN);
+      expect(res.error.message).to.be.an('string');
+    });
+    it('Should use refresh token only once');
+    it('Should set invalid refresh token after logout');
+    it('Must be valid multiple refresh tokens');
   });
 
   describe('/register', () => {

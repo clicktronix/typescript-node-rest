@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { Server } from 'http';
 import * as httpStatus from 'http-status';
+import * as R from 'ramda';
 
 import { default as app } from '../src/app';
 
@@ -37,38 +38,49 @@ describe('User module', () => {
 
   describe('/users', () => {
     it('Should get users', async () => {
-      const res = await server.get('/users');
+      const res = await server
+        .get('/users')
+        .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
       expect(res.body.data).to.be.an('array');
     });
 
     it('Should return user by id', async () => {
-      const res = await server.get(`/users/${userResponseData.body.data._id}`);
+      const res = await server
+        .get(`/users/${userResponseData.body.data._id}`)
+        .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
-      expect(res.body.data).to.deep.equal(userResponseData.body.data);
+      expect(R.omit(['updatedAt'], res.body.data)).to.deep.equal(R.omit(['updatedAt'], userResponseData.body.data));
     });
 
     it('Should return error if user does not exist', async () => {
-      const res = await server.get(`/users/${INVALID_USER_ID}`);
+      const res = await server
+        .get(`/users/${INVALID_USER_ID}`)
+        .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
       expect(res.error.message).to.be.an('string');
     });
 
     it('Should update user by id', async () => {
-      const res = await server.put('/users').send(userResponseData.body.data);
+      const res = await server
+        .put('/users').send(userResponseData.body.data)
+        .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
       expect(res.body.data).to.deep.equal(userResponseData.body.data);
     });
 
     it('Should return error if user does not exist, when it updating', async () => {
-      const res = await server.put('/users').send({
-        ...userResponseData.body.data,
-        email: '123@mail.ru',
-      });
+      const res = await server
+        .put('/users')
+        .send({
+          ...userResponseData.body.data,
+          email: '123@mail.ru',
+        })
+        .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
       expect(res.error.message).to.be.an('string');
@@ -81,16 +93,22 @@ describe('User module', () => {
         email: 'emailForDelete@gmail.com',
         password: '123456',
       };
-      await server.post('/register').send(newUser);
-      const registeredUser = await server.post('/authenticate').send(newUser);
-      const res = await server.delete(`/users/${registeredUser.body.data._id}`);
+      await server.post('/register').send(newUser).set('Authorization', userResponseData.body.token.accessToken);
+
+      const registeredUser = await server
+        .post('/authenticate')
+        .send(newUser)
+        .set('Authorization', userResponseData.body.token.accessToken);
+      const res = await server
+        .delete(`/users/${registeredUser.body.data._id}`)
+        .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
       expect(res.body.message).to.be.an('string');
     });
 
     it('Should throw error if the userId being deleted does not exist', async () => {
-      const res = await server.delete(`/users`);
+      const res = await server.delete(`/users`).set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.METHOD_NOT_ALLOWED);
       expect(res.error.message).to.be.an('string');

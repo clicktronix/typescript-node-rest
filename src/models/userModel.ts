@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import * as R from 'ramda';
 
 import { CONFIG } from 'config';
 import { IUserModel } from 'shared/types/models';
@@ -32,8 +33,11 @@ export const UserSchema = new Schema<IUserModel>({
     type: String,
     required: [true, 'Enter password'],
     trim: true,
-    maxlength: [50, 'You have exceeded the maximum password length'],
     minlength: [5, 'Password is too short'],
+    select: false,
+  },
+  tokens: {
+    type: [String],
     select: false,
   },
 }, {
@@ -47,7 +51,7 @@ export const UserSchema = new Schema<IUserModel>({
  * Password hash middleware
  */
 UserSchema.pre('save', async function() {
-  if (!this.isModified('password')) { return; }
+  if (!(this as IUserModel).isModified('password')) { return; }
   try {
     const salt = await bcrypt.genSalt(SALT_ROUND);
     const hash = await bcrypt.hash((this as IUserModel).password, salt);
@@ -61,14 +65,14 @@ UserSchema.pre('save', async function() {
  * Helper method for validating user's password
  */
 UserSchema.methods.comparePassword = function(pwd: string) {
-  return bcrypt.compareSync(pwd, this.password);
+  return bcrypt.compareSync(pwd, (this as IUserModel).password);
 };
 
 /**
  * Get full name method
  */
 UserSchema.virtual('fullName').get(function() {
-  return this.name.first + ' ' + this.name.last;
+  return (this as IUserModel).name + ' ' + (this as IUserModel).surname;
 });
 
 /**
@@ -76,7 +80,14 @@ UserSchema.virtual('fullName').get(function() {
  */
 UserSchema.methods.getJWT = function() {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
-  return 'Bearer' + jwt.sign({ user_id: this._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
+  return 'Bearer ' + jwt.sign({ id: (this as IUserModel)._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
+};
+
+/**
+ * Helper method for getting jwt token
+ */
+UserSchema.methods.getRefreshToken = function() {
+  return R.last(this.tokens);
 };
 
 export const User = mongoose.model<IUserModel>('User', UserSchema);
