@@ -1,16 +1,23 @@
 import { default as Router } from 'koa-router';
+import { default as jwtMiddleware } from 'koa-jwt';
 
 import { UserController, AuthController } from 'controllers';
+import { CONFIG } from 'config';
 
 const router = new Router();
 const userController: UserController = new UserController();
 const authController: AuthController = new AuthController();
 
-// Auth routes
+// Public routes
 router.post('/register', authController.registerNewUser);
 router.post('/authenticate', authController.authenticate);
 
-// User routes
+// Private routes
+router.use(jwtMiddleware({
+  secret: CONFIG.jwt_encryption,
+}));
+router.post('/authenticate/refresh', authController.refreshAccessToken);
+router.post('/logout', authController.logout);
 router.get('/users', userController.getUsers);
 router.get('/users/:userId', userController.getUserById);
 router.put('/users', userController.updateUser);

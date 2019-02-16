@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
  */
 dotenv.config();
 
-export const CONFIG: Record<string, string> = {
+export const CONFIG = {
   app: process.env.APP || 'dev',
   host: process.env.HOST || '0.0.0.0',
   port: process.env.PORT || '8080',
@@ -15,6 +15,6 @@ export const CONFIG: Record<string, string> = {
   db_name: process.env.DB_NAME || 'roulette-rest',
   db_user: process.env.DB_USER || 'user',
   db_password: process.env.DB_PASSWORD || 'password',
-  jwt_encryption: process.env.JWT_ENCRYPTION || 'jwt_please_change',
-  jwt_expiration: process.env.JWT_EXPIRATION || '10000',
+  jwt_encryption: process.env.NODE_ENV === 'test' ? 'TEST_KEY' : process.env.JWT_ENCRYPTION || 'SECRET_KEY',
+  jwt_expiration: process.env.NODE_ENV === 'test' ? '3000' : process.env.JWT_EXPIRATION || '12000000',
 };
