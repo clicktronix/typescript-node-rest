@@ -3,7 +3,7 @@ import * as httpStatus from 'http-status';
 import * as R from 'ramda';
 
 import { User } from 'models/userModel';
-import { add, update } from 'services/refreshToken';
+import * as refreshTokenService from 'services/refreshToken';
 
 export default class AuthController {
   /**
@@ -40,7 +40,7 @@ export default class AuthController {
       if (!user.comparePassword(body.password)) {
         return ctx.throw(httpStatus.FORBIDDEN, 'Wrong password');
       }
-      user.tokens = add(user.tokens);
+      user.tokens = refreshTokenService.add(user.tokens);
       user.save();
       ctx.status = httpStatus.OK;
       ctx.body = {
@@ -56,6 +56,30 @@ export default class AuthController {
   }
 
   /**
+   * POST /logout
+   * Sign in using email and password
+   */
+  public async logout(ctx: BaseContext) {
+    const { body: { email, refreshToken } } = ctx.request;
+    try {
+      const user = await User.findOne({ email }).select('+tokens');
+      if (!user) {
+        return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
+      }
+      const updatedTokens = refreshTokenService.remove(user.tokens, refreshToken);
+      if (updatedTokens instanceof Error) {
+        return ctx.throw(httpStatus.FORBIDDEN, updatedTokens.message);
+      }
+      user.tokens = updatedTokens;
+      user.save();
+      ctx.status = httpStatus.OK;
+      ctx.body = { success: true };
+    } catch (err) {
+      ctx.throw(err.status, err.message);
+    }
+  }
+
+  /**
    * POST /authenticate/refresh
    */
   public async refreshAccessToken(ctx: BaseContext) {
@@ -65,7 +89,7 @@ export default class AuthController {
       if (!user) {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
-      const updatedTokens = update(user.tokens, refreshToken);
+      const updatedTokens = refreshTokenService.update(user.tokens, refreshToken);
       if (updatedTokens instanceof Error) {
         return ctx.throw(httpStatus.FORBIDDEN, updatedTokens.message);
       }

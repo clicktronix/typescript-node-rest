@@ -13,10 +13,11 @@ router.post('/register', authController.registerNewUser);
 router.post('/authenticate', authController.authenticate);
 
 // Private routes
-router.post('/authenticate/refresh', authController.refreshAccessToken);
 router.use(jwtMiddleware({
   secret: CONFIG.jwt_encryption,
 }));
+router.post('/authenticate/refresh', authController.refreshAccessToken);
+router.post('/logout', authController.logout);
 router.get('/users', userController.getUsers);
 router.get('/users/:userId', userController.getUserById);
 router.put('/users', userController.updateUser);

@@ -14,6 +14,13 @@ export function update(tokens: string[], token: string) {
   if (R.indexOf(token, tokens) === -1) {
     return Error('Token is invalid');
   }
-  R.without([token], tokens);
-  return add(tokens);
+  const updatedTokens = R.without([token], tokens);
+  return add(updatedTokens);
+}
+
+export function remove(tokens: string[], token: string) {
+  if (R.indexOf(token, tokens) === -1) {
+    return Error('Token is invalid');
+  }
+  return R.without([token], tokens);
 }
