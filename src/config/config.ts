@@ -16,5 +16,5 @@ export const CONFIG = {
   db_user: process.env.DB_USER || 'user',
   db_password: process.env.DB_PASSWORD || 'password',
   jwt_encryption: process.env.NODE_ENV === 'test' ? 'TEST_KEY' : process.env.JWT_ENCRYPTION || 'SECRET_KEY',
-  jwt_expiration: process.env.NODE_ENV === 'test' ? '3000' : process.env.JWT_EXPIRATION || '12000000',
+  jwt_expiration: process.env.JWT_EXPIRATION || '600000',
 };

@@ -1,37 +1,34 @@
 import { expect } from 'chai';
-import { Server } from 'http';
 import * as httpStatus from 'http-status';
-import * as R from 'ramda';
 
-import { default as app } from '../src/app';
+import { default as app } from '../src';
+import { CONFIG } from 'config';
 
 const agent = require('supertest-koa-agent');
 
 const userRequest = {
-  name: 'Name',
-  surname: 'Surname',
-  email: 'email@gmail.com',
+  email: 'authEmail@gmail.com',
   password: '123456',
 };
 
 describe('Auth module', () => {
   let server: any;
-  let appInstance: Server;
-  let userResponseData: any;
 
   before(async () => {
     try {
-      appInstance = app.listen(8080);
       server = agent(app);
-      await server.post('/register').send(userRequest);
-      userResponseData = await server.post('/authenticate').send(userRequest);
+      await server.post('/register').send({
+        ...userRequest,
+        name: 'Name',
+        surname: 'Surname',
+      });
     } catch (err) {
       console.error(err);
     }
   });
 
   after(() => {
-    appInstance.close();
+    server.app.close();
   });
 
   describe('/authenticate', () => {
@@ -39,7 +36,7 @@ describe('Auth module', () => {
       const res = await server.post('/authenticate').send(userRequest);
 
       expect(res.status).to.equal(httpStatus.OK);
-      expect(R.omit(['updatedAt'], res.body.data)).to.deep.equal(R.omit(['updatedAt'], userResponseData.body.data));
+      expect(res.body.data).to.be.an('object');
       expect(res.body.token.accessToken).to.be.an('string');
       expect(res.body.token.refreshToken).to.be.an('string');
     });
@@ -96,15 +93,17 @@ describe('Auth module', () => {
       expect(res.body.success).to.equal(true);
     });
 
-    // it('Should return 401 on expired token', async () => {
-    //   const res = await server
-    //     .get('/users')
-    //     .set('Authorization', userResponseData.body.token.accessToken);
+    it('Should return 401 on expired token', async () => {
+      const expiration = CONFIG.jwt_expiration;
+      CONFIG.jwt_expiration = '0';
+      const user = await server.post('/authenticate').send(userRequest);
+      const res = await server
+        .get('/users')
+        .set('Authorization', user.body.token.accessToken);
+      CONFIG.jwt_expiration = expiration;
 
-    //   await setTimeout(() => {
-    //     expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
-    //   }, 5000);
-    // });
+      expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
+    });
   });
 
   describe('/authenticate/refresh', () => {
@@ -205,7 +204,7 @@ describe('Auth module', () => {
     it('Should register new user', async () => {
       const res = await server.post('/register').send({
         email: 'newEmail123@gmail.com',
-        password: '12345',
+        password: '123456',
         name: 'name',
         surname: 'surname',
       });
