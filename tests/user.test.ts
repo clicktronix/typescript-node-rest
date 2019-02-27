@@ -1,15 +1,13 @@
 import { expect } from 'chai';
-import { Server } from 'http';
+import { Response } from 'koa';
 import * as httpStatus from 'http-status';
 import * as R from 'ramda';
 
-import { default as app } from '../src/app';
+import { default as app } from '../src';
 
 const agent = require('supertest-koa-agent');
 
 const userRequest = {
-  name: 'Name',
-  surname: 'Surname',
   email: 'userEmail@gmail.com',
   password: '123456',
 };
@@ -18,14 +16,16 @@ const INVALID_USER_ID = '5c535bec1234352055129874';
 
 describe('User module', () => {
   let server: any;
-  let appInstance: Server;
-  let userResponseData: any;
+  let userResponseData: Response;
 
   before(async () => {
     try {
-      appInstance = app.listen(8080);
       server = agent(app);
-      await server.post('/register').send(userRequest);
+      await server.post('/register').send({
+        ...userRequest,
+        name: 'Name',
+        surname: 'Surname',
+      });
       userResponseData = await server.post('/authenticate').send(userRequest);
     } catch (err) {
       console.error(err);
@@ -33,7 +33,7 @@ describe('User module', () => {
   });
 
   after(() => {
-    appInstance.close();
+    server.app.close();
   });
 
   describe('/users', () => {
