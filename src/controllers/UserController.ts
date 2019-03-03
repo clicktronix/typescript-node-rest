@@ -12,7 +12,7 @@ export default class UserController {
       const users = await User.find({});
       ctx.status = httpStatus.OK;
       ctx.body = {
-        data: users,
+        data: users || [],
       };
     } catch (err) {
       ctx.throw(err.status, err.message);
@@ -63,8 +63,7 @@ export default class UserController {
   public async deleteUser(ctx: BaseContext) {
     try {
       await User.deleteOne({ _id: ctx.request.ctx.params.userId });
-      ctx.status = httpStatus.OK;
-      ctx.body = { message: 'Successfully deleted user' };
+      ctx.status = httpStatus.NO_CONTENT;
     } catch (err) {
       ctx.throw(err.status, err.message);
     }

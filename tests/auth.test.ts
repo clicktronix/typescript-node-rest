@@ -47,7 +47,7 @@ describe('Auth module', () => {
         password: 'INVALID',
       });
 
-      expect(res.status).to.equal(httpStatus.FORBIDDEN);
+      expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
       expect(res.error.message).to.be.an('string');
     });
 
@@ -132,7 +132,7 @@ describe('Auth module', () => {
           refreshToken: 'INVALID',
         });
 
-      expect(res.status).to.equal(httpStatus.FORBIDDEN);
+      expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
       expect(res.error.message).to.be.an('string');
     });
 
@@ -158,7 +158,7 @@ describe('Auth module', () => {
           refreshToken: user.body.token.refreshToken,
         });
 
-      expect(secondRes.status).to.equal(httpStatus.FORBIDDEN);
+      expect(secondRes.status).to.equal(httpStatus.UNAUTHORIZED);
       expect(secondRes.error.message).to.be.an('string');
     });
 
@@ -209,8 +209,7 @@ describe('Auth module', () => {
         surname: 'surname',
       });
 
-      expect(res.status).to.equal(httpStatus.OK);
-      expect(res.body.message).to.equal('User successfully registered');
+      expect(res.status).to.equal(httpStatus.CREATED);
     });
   });
 });

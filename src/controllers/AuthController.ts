@@ -17,10 +17,7 @@ export default class AuthController {
         return ctx.throw(httpStatus.FORBIDDEN, 'Email is used');
       }
       await newUser.save();
-      ctx.status = httpStatus.OK;
-      ctx.body = {
-        message: 'User successfully registered',
-      };
+      ctx.status = httpStatus.CREATED;
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
@@ -38,7 +35,7 @@ export default class AuthController {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
       if (!user.comparePassword(body.password)) {
-        return ctx.throw(httpStatus.FORBIDDEN, 'Wrong password');
+        return ctx.throw(httpStatus.UNAUTHORIZED, 'Wrong password');
       }
       user.tokens = refreshTokenService.add(user.tokens);
       user.save();
@@ -68,7 +65,7 @@ export default class AuthController {
       }
       const updatedTokens = refreshTokenService.remove(user.tokens, refreshToken);
       if (updatedTokens instanceof Error) {
-        return ctx.throw(httpStatus.FORBIDDEN, updatedTokens.message);
+        return ctx.throw(httpStatus.UNAUTHORIZED, updatedTokens.message);
       }
       user.tokens = updatedTokens;
       user.save();
@@ -91,7 +88,7 @@ export default class AuthController {
       }
       const updatedTokens = refreshTokenService.update(user.tokens, refreshToken);
       if (updatedTokens instanceof Error) {
-        return ctx.throw(httpStatus.FORBIDDEN, updatedTokens.message);
+        return ctx.throw(httpStatus.UNAUTHORIZED, updatedTokens.message);
       }
       user.tokens = updatedTokens;
       user.save();
