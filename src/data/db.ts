@@ -1,5 +1,5 @@
 import { default as mongoose } from 'mongoose';
-import { default as MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 import { CONFIG } from 'config';
 import { EventEmitter } from 'events';
@@ -13,6 +13,7 @@ export class DataBase {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
+    useUnifiedTopology: true,
   };
 
   public async connect() {

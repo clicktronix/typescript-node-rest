@@ -70,7 +70,7 @@ describe('User module', () => {
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
-      expect(res.body.data).to.deep.equal(userResponseData.body.data);
+      expect(R.omit(['updatedAt'], res.body.data)).to.deep.equal(R.omit(['updatedAt'], userResponseData.body.data));
     });
 
     it('Should return error if user does not exist, when it updating', async () => {
