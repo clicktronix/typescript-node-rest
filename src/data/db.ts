@@ -33,7 +33,6 @@ export class DataBase {
         console.error(err);
         process.exit();
       });
-      this.emitter.emit('dbReady');
     }
   }
 }
