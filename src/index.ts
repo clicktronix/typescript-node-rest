@@ -12,9 +12,7 @@ class App {
   constructor() {
     this.app = new Koa();
     this.db = new DataBase();
-    this.app.on('dbReady', () => {
-      this.app.listen(CONFIG.port, () => console.log(`Server is listening on ${CONFIG.port}`));
-    });
+    this.app.listen(CONFIG.port, () => console.log(`Server is listening on ${CONFIG.port}`));
     this.db.connect();
     this.setMiddlewares();
   }

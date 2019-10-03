@@ -1,7 +1,7 @@
 import { BaseContext } from 'koa';
 import * as httpStatus from 'http-status';
 
-import { User } from 'models/userModel';
+import { User } from 'models';
 
 export default class UserController {
   /**

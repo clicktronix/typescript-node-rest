@@ -40,6 +40,10 @@ export const UserSchema = new Schema<IUserModel>({
     type: [String],
     select: false,
   },
+  messages: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Message',
+  }],
 }, {
     timestamps: true,
     useNestedStrict: true,

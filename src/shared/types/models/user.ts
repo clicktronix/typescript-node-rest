@@ -1,4 +1,5 @@
 import { Document } from 'mongoose';
+import { IMessageModel } from './message';
 
 export interface IUser {
   email: string;
@@ -6,6 +7,7 @@ export interface IUser {
   surname: string;
   password: string;
   tokens: string[];
+  messages: IMessageModel[];
 }
 
 export interface IUserModel extends IUser, Document {
