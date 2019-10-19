@@ -27,5 +27,6 @@ router.get('/messages', messageController.getMessages);
 router.post('/messages', messageController.postMessage);
 router.patch('/messages/:messageId', messageController.updateMessage);
 router.delete('/messages/:messageId', messageController.deleteMessage);
+router.get('/messages/:messageId', messageController.getMessage);
 
 export { router };

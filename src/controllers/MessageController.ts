@@ -1,6 +1,7 @@
 import { BaseContext } from 'koa';
 import * as httpStatus from 'http-status';
 import * as jwt from 'jsonwebtoken';
+import { bind } from 'decko';
 
 import { Message, User } from 'models';
 import { isString } from 'shared/types/guards';
@@ -13,7 +14,7 @@ export default class MessageController {
    */
   public async getMessages(ctx: BaseContext) {
     try {
-      const messages = await Message.find().populate('user', 'firstName');
+      const messages = await Message.find().populate('user', 'email');
       ctx.status = httpStatus.OK;
       ctx.body = {
         data: messages || [],
@@ -24,12 +25,34 @@ export default class MessageController {
   }
 
   /**
-   * POST /messages
+   * GET /messages:messageId
    */
-  public async postMessage(ctx: BaseContext) {
-    const { body } = ctx.request;
+  @bind
+  public async getMessage(ctx: BaseContext) {
+    const { headers } = ctx.request;
     try {
-      const usersMeta = this.decodeToken(ctx);
+      const usersMeta = this.decodeToken(headers.authorization);
+      const message = await this.findMessage(ctx, usersMeta);
+      if (!message) {
+        return ctx.throw(httpStatus.NOT_FOUND, 'Message not found');
+      }
+      ctx.body = {
+        data: message,
+      };
+      ctx.status = httpStatus.OK;
+    } catch (err) {
+      ctx.throw(err.status, err.message);
+    }
+  }
+
+  /**
+   * POST /messages:messageId
+   */
+  @bind
+  public async postMessage(ctx: BaseContext) {
+    const { body, headers } = ctx.request;
+    try {
+      const usersMeta = this.decodeToken(headers.authorization);
       const user = await User.findById(usersMeta.id);
       if (!user) {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
@@ -47,12 +70,13 @@ export default class MessageController {
   }
 
   /**
-   * PATCH /messages
+   * PATCH /messages:messageId
    */
+  @bind
   public async updateMessage(ctx: BaseContext) {
-    const { body } = ctx.request;
+    const { body, headers } = ctx.request;
     try {
-      const usersMeta = this.decodeToken(ctx);
+      const usersMeta = this.decodeToken(headers.authorization);
       const message = await this.findMessage(ctx, usersMeta);
       if (message) {
         message.content = body.content;
@@ -65,11 +89,13 @@ export default class MessageController {
   }
 
   /**
-   * DELETE /messages
+   * DELETE /messages:messageId
    */
+  @bind
   public async deleteMessage(ctx: BaseContext) {
+    const { headers } = ctx.request;
     try {
-      const usersMeta = this.decodeToken(ctx);
+      const usersMeta = this.decodeToken(headers.authorization);
       const message = await this.findMessage(ctx, usersMeta);
       message && await message.remove();
       ctx.status = httpStatus.OK;
@@ -80,11 +106,12 @@ export default class MessageController {
 
   private async findMessage(ctx: BaseContext, usersMeta: IUserModel) {
     try {
-      const message = await Message.findById(ctx.params.id);
-      if (!message) {
+      const message = await Message.findById(ctx.request.ctx.params.messageId);
+      const user = await User.findById(usersMeta.id);
+      if (!message || !user) {
         return ctx.throw(httpStatus.NOT_FOUND, 'Message not found');
       }
-      if (message.user.id !== usersMeta.id) {
+      if (!message.user._id.equals(user._id)) {
         return ctx.throw(httpStatus.UNAUTHORIZED, 'You have not permissions');
       }
       return message;
@@ -93,12 +120,11 @@ export default class MessageController {
     }
   }
 
-  private decodeToken(ctx: BaseContext) {
-    const { headers } = ctx.request;
-    const token = headers.authorization.replace('Bearer ', '');
+  private decodeToken(usersToken: string) {
+    const token = usersToken.replace('Bearer ', '');
     const decoded = jwt.verify(token, CONFIG.jwt_encryption);
     if (!decoded || isString(decoded)) {
-      return ctx.throw(httpStatus.UNAUTHORIZED, 'Invalid token');
+      throw new Error('Invalid token');
     }
     return decoded as IUserModel;
   }
