@@ -19,10 +19,12 @@ router.use(jwtMiddleware({
 }));
 router.post('/authenticate/refresh', authController.refreshAccessToken);
 router.post('/logout', authController.logout);
+
 router.get('/users', userController.getUsers);
 router.get('/users/:userId', userController.getUserById);
 router.put('/users', userController.updateUser);
 router.delete('/users/:userId', userController.deleteUser);
+
 router.get('/messages', messageController.getMessages);
 router.post('/messages', messageController.postMessage);
 router.patch('/messages/:messageId', messageController.updateMessage);

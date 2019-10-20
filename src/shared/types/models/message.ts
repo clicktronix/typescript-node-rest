@@ -3,7 +3,8 @@ import { IUserModel } from './user';
 
 export interface IMessage {
   content: string;
-  user: IUserModel;
+  sender: IUserModel;
+  owner: IUserModel;
 }
 
 export interface IMessageModel extends IMessage, Document { }

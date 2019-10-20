@@ -53,16 +53,18 @@ export default class MessageController {
     const { body, headers } = ctx.request;
     try {
       const usersMeta = this.decodeToken(headers.authorization);
-      const user = await User.findById(usersMeta.id);
-      if (!user) {
+      const sender = await User.findById(usersMeta.id);
+      const owner = await User.findOne({ email: body.to });
+      if (!sender || !owner) {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
       const message = new Message({
         content: body.content,
-        user,
+        sender,
+        owner,
       });
       await message.save();
-      await user.messages.push(message);
+      await owner.messages.push(message);
       ctx.status = httpStatus.CREATED;
     } catch (err) {
       ctx.throw(err.status, err.message);
@@ -111,7 +113,7 @@ export default class MessageController {
       if (!message || !user) {
         return ctx.throw(httpStatus.NOT_FOUND, 'Message not found');
       }
-      if (!message.user._id.equals(user._id)) {
+      if (!message.owner._id.equals(user._id)) {
         return ctx.throw(httpStatus.UNAUTHORIZED, 'You have not permissions');
       }
       return message;

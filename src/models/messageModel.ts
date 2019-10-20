@@ -9,14 +9,18 @@ const MessageSchema = new Schema<IMessageModel>({
     type: String,
     required: true,
   },
-  user: {
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  sender: {
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
 });
 
 MessageSchema.post('remove', (message: IMessageModel) => {
-  User.findById(message.user)
+  User.findById(message.owner)
     .then(user => {
       if (user) {
         user.messages.push(message);
