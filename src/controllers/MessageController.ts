@@ -46,7 +46,7 @@ export default class MessageController {
   }
 
   /**
-   * POST /messages:messageId
+   * POST /messages
    */
   @bind
   public async postMessage(ctx: BaseContext) {
@@ -111,7 +111,7 @@ export default class MessageController {
       const message = await Message.findById(ctx.request.ctx.params.messageId);
       const user = await User.findById(usersMeta.id);
       if (!message || !user) {
-        return ctx.throw(httpStatus.NOT_FOUND, 'Message not found');
+        return ctx.throw(httpStatus.NOT_FOUND, 'Message or user not found');
       }
       if (!message.owner._id.equals(user._id)) {
         return ctx.throw(httpStatus.UNAUTHORIZED, 'You have not permissions');
