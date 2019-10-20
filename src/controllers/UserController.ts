@@ -38,7 +38,7 @@ export default class UserController {
   }
 
   /**
-   * PUT /users
+   * PUT /users:userId
    */
   public async updateUser(ctx: BaseContext) {
     const { request } = ctx;
@@ -58,7 +58,7 @@ export default class UserController {
   }
 
   /**
-   * DELETE /users/:userId
+   * DELETE /users:userId
    */
   public async deleteUser(ctx: BaseContext) {
     try {
