@@ -1,4 +1,4 @@
-import { BaseContext } from 'koa';
+import { Context } from 'koa';
 import * as httpStatus from 'http-status';
 import * as jwt from 'jsonwebtoken';
 import { bind } from 'decko';
@@ -12,7 +12,7 @@ export default class MessageController {
   /**
    * GET /messages
    */
-  public async getMessages(ctx: BaseContext) {
+  public async getMessages(ctx: Context) {
     try {
       const messages = await Message.find().populate('user', 'email');
       ctx.status = httpStatus.OK;
@@ -28,7 +28,7 @@ export default class MessageController {
    * GET /messages:messageId
    */
   @bind
-  public async getMessage(ctx: BaseContext) {
+  public async getMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {
       const usersMeta = this.decodeToken(headers.authorization);
@@ -49,7 +49,7 @@ export default class MessageController {
    * POST /messages
    */
   @bind
-  public async postMessage(ctx: BaseContext) {
+  public async postMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
       const usersMeta = this.decodeToken(headers.authorization);
@@ -75,7 +75,7 @@ export default class MessageController {
    * PATCH /messages:messageId
    */
   @bind
-  public async updateMessage(ctx: BaseContext) {
+  public async updateMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
       const usersMeta = this.decodeToken(headers.authorization);
@@ -94,7 +94,7 @@ export default class MessageController {
    * DELETE /messages:messageId
    */
   @bind
-  public async deleteMessage(ctx: BaseContext) {
+  public async deleteMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {
       const usersMeta = this.decodeToken(headers.authorization);
@@ -106,7 +106,7 @@ export default class MessageController {
     }
   }
 
-  private async findMessage(ctx: BaseContext, usersMeta: IUserModel) {
+  private async findMessage(ctx: Context, usersMeta: IUserModel) {
     try {
       const message = await Message.findById(ctx.request.ctx.params.messageId);
       const user = await User.findById(usersMeta.id);

@@ -1,4 +1,4 @@
-import { BaseContext } from 'koa';
+import { Context } from 'koa';
 import * as httpStatus from 'http-status';
 import * as R from 'ramda';
 
@@ -9,7 +9,7 @@ export default class AuthController {
   /**
    * POST /register
    */
-  public async registerNewUser(ctx: BaseContext) {
+  public async registerNewUser(ctx: Context) {
     const { body } = ctx.request;
     try {
       const newUser = new User(body);
@@ -27,7 +27,7 @@ export default class AuthController {
    * POST /authenticate
    * Sign in using email and password
    */
-  public async authenticate(ctx: BaseContext) {
+  public async authenticate(ctx: Context) {
     const { body } = ctx.request;
     try {
       const user = await User.findOne({ email: body.email }).select('+password +tokens');
@@ -56,7 +56,7 @@ export default class AuthController {
    * POST /logout
    * Sign in using email and password
    */
-  public async logout(ctx: BaseContext) {
+  public async logout(ctx: Context) {
     const { body: { email, refreshToken } } = ctx.request;
     try {
       const user = await User.findOne({ email }).select('+tokens');
@@ -79,7 +79,7 @@ export default class AuthController {
   /**
    * POST /authenticate/refresh
    */
-  public async refreshAccessToken(ctx: BaseContext) {
+  public async refreshAccessToken(ctx: Context) {
     const { body: { email, refreshToken } } = ctx.request;
     try {
       const user = await User.findOne({ email }).select('+tokens');

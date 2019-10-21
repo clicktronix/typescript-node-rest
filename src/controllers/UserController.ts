@@ -1,4 +1,4 @@
-import { BaseContext } from 'koa';
+import { Context } from 'koa';
 import * as httpStatus from 'http-status';
 
 import { User } from 'models';
@@ -7,7 +7,7 @@ export default class UserController {
   /**
    * GET /users
    */
-  public async getUsers(ctx: BaseContext) {
+  public async getUsers(ctx: Context) {
     try {
       const users = await User.find({});
       ctx.status = httpStatus.OK;
@@ -22,7 +22,7 @@ export default class UserController {
   /**
    * GET /users/:userId
    */
-  public async getUserById(ctx: BaseContext) {
+  public async getUserById(ctx: Context) {
     try {
       const user = await User.findById(ctx.request.ctx.params.userId);
       if (!user) {
@@ -40,7 +40,7 @@ export default class UserController {
   /**
    * PUT /users:userId
    */
-  public async updateUser(ctx: BaseContext) {
+  public async updateUser(ctx: Context) {
     const { request } = ctx;
     try {
       const user = await User.findOneAndUpdate({ email: request.body.email }, request.body, { new: true });
@@ -60,7 +60,7 @@ export default class UserController {
   /**
    * DELETE /users:userId
    */
-  public async deleteUser(ctx: BaseContext) {
+  public async deleteUser(ctx: Context) {
     try {
       await User.deleteOne({ _id: ctx.request.ctx.params.userId });
       ctx.status = httpStatus.NO_CONTENT;
