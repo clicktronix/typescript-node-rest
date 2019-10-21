@@ -10,6 +10,7 @@ const Schema = mongoose.Schema;
 const SALT_ROUND = 10;
 
 export const UserSchema = new Schema<IUserModel>({
+  id: Schema.Types.ObjectId,
   name: {
     type: String,
     required: [true, 'Name is required'],
@@ -40,6 +41,10 @@ export const UserSchema = new Schema<IUserModel>({
     type: [String],
     select: false,
   },
+  messages: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Message',
+  }],
 }, {
     timestamps: true,
     useNestedStrict: true,

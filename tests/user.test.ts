@@ -70,7 +70,7 @@ describe('User module', () => {
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
-      expect(res.body.data).to.deep.equal(userResponseData.body.data);
+      expect(R.omit(['updatedAt'], res.body.data)).to.deep.equal(R.omit(['updatedAt'], userResponseData.body.data));
     });
 
     it('Should return error if user does not exist, when it updating', async () => {
@@ -103,8 +103,7 @@ describe('User module', () => {
         .delete(`/users/${registeredUser.body.data._id}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
-      expect(res.status).to.equal(httpStatus.OK);
-      expect(res.body.message).to.be.an('string');
+      expect(res.status).to.equal(httpStatus.NO_CONTENT);
     });
 
     it('Should throw error if the userId being deleted does not exist', async () => {
