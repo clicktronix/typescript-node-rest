@@ -25,7 +25,7 @@ export default class MessageController {
   }
 
   /**
-   * GET /messages:messageId
+   * GET /messages/:messageId
    */
   @bind
   public async getMessage(ctx: Context) {
@@ -72,7 +72,7 @@ export default class MessageController {
   }
 
   /**
-   * PATCH /messages:messageId
+   * PATCH /messages/:messageId
    */
   @bind
   public async updateMessage(ctx: Context) {
@@ -91,7 +91,7 @@ export default class MessageController {
   }
 
   /**
-   * DELETE /messages:messageId
+   * DELETE /messages/:messageId
    */
   @bind
   public async deleteMessage(ctx: Context) {

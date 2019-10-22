@@ -4,6 +4,7 @@ import * as R from 'ramda';
 
 import { User } from 'models/userModel';
 import * as refreshTokenService from 'services/refreshToken';
+import { bind } from 'decko';
 
 export default class AuthController {
   /**
@@ -27,13 +28,11 @@ export default class AuthController {
    * POST /authenticate
    * Sign in using email and password
    */
+  @bind
   public async authenticate(ctx: Context) {
     const { body } = ctx.request;
     try {
-      const user = await User.findOne({ email: body.email }).select('+password +tokens');
-      if (!user) {
-        return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
-      }
+      const user = await this.getUser(ctx, '+password +tokens');
       if (!user.comparePassword(body.password)) {
         return ctx.throw(httpStatus.UNAUTHORIZED, 'Wrong password');
       }
@@ -56,17 +55,12 @@ export default class AuthController {
    * POST /logout
    * Sign in using email and password
    */
+  @bind
   public async logout(ctx: Context) {
-    const { body: { email, refreshToken } } = ctx.request;
+    const { body: { refreshToken } } = ctx.request;
     try {
-      const user = await User.findOne({ email }).select('+tokens');
-      if (!user) {
-        return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
-      }
+      const user = await this.getUser(ctx, '+tokens');
       const updatedTokens = refreshTokenService.remove(user.tokens, refreshToken);
-      if (updatedTokens instanceof Error) {
-        return ctx.throw(httpStatus.UNAUTHORIZED, updatedTokens.message);
-      }
       user.tokens = updatedTokens;
       user.save();
       ctx.status = httpStatus.OK;
@@ -79,17 +73,12 @@ export default class AuthController {
   /**
    * POST /authenticate/refresh
    */
+  @bind
   public async refreshAccessToken(ctx: Context) {
-    const { body: { email, refreshToken } } = ctx.request;
+    const { body: { refreshToken } } = ctx.request;
     try {
-      const user = await User.findOne({ email }).select('+tokens');
-      if (!user) {
-        return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
-      }
+      const user = await this.getUser(ctx, '+tokens');
       const updatedTokens = refreshTokenService.update(user.tokens, refreshToken);
-      if (updatedTokens instanceof Error) {
-        return ctx.throw(httpStatus.UNAUTHORIZED, updatedTokens.message);
-      }
       user.tokens = updatedTokens;
       user.save();
       ctx.status = httpStatus.OK;
@@ -102,5 +91,12 @@ export default class AuthController {
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
+  }
+
+  @bind
+  private async getUser(ctx: Context, selectQuery: string) {
+    const { body: { email } } = ctx.request;
+    const user = await User.findOne({ email }).select(selectQuery);
+    return user ? user : ctx.throw(httpStatus.NOT_FOUND, 'User not found');
   }
 }
