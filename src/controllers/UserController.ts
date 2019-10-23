@@ -3,7 +3,7 @@ import * as httpStatus from 'http-status';
 
 import { User } from 'models';
 
-export default class UserController {
+export class UserController {
   /**
    * GET /users
    */

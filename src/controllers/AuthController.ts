@@ -6,7 +6,7 @@ import { User } from 'models/userModel';
 import * as refreshTokenService from 'shared/helpers/refreshToken';
 import { bind } from 'decko';
 
-export default class AuthController {
+export class AuthController {
   /**
    * POST /register
    */
@@ -53,7 +53,6 @@ export default class AuthController {
 
   /**
    * POST /logout
-   * Sign in using email and password
    */
   @bind
   public async logout(ctx: Context) {

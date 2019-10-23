@@ -2,10 +2,10 @@ import { default as Koa } from 'koa';
 import { default as bodyParser } from 'koa-bodyparser';
 import { default as socketIo } from 'socket.io';
 
+import { ChatController } from 'controllers';
 import { router } from './routes';
 import { DataBase } from './data';
 import { CONFIG } from './config';
-import ChatController from 'controllers/ChatController';
 
 class App {
   public app: Koa;
@@ -29,7 +29,7 @@ class App {
   private listening() {
     this.app.listen(CONFIG.port, () => console.log(`Server is listening on port ${CONFIG.port}`));
 
-    this.io.on('connect', (socket: socketIo.Socket) => {
+    this.io.of('/chat').on('connect', (socket: socketIo.Socket) => {
       console.log('Connected client on port ', CONFIG.port);
       const chatController = new ChatController(socket);
 

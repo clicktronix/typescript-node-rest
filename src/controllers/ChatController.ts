@@ -3,7 +3,7 @@ import { default as socketIo } from 'socket.io';
 import { Chat, Message } from 'models';
 import { IMessageRequest } from 'shared/types/models';
 
-export default class ChatController {
+export class ChatController {
   constructor(private socket: socketIo.Socket) { }
 
   public async handleMessage(data: IMessageRequest) {

@@ -4,11 +4,11 @@ import * as jwt from 'jsonwebtoken';
 import { bind } from 'decko';
 
 import { Message, User } from 'models';
-import { isString } from 'shared/types/guards';
 import { CONFIG } from 'config';
+import { isString } from 'shared/types/guards';
 import { IUserModel } from 'shared/types/models';
 
-export default class MessageController {
+export class MessageController {
   /**
    * GET /messages
    */
