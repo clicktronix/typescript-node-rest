@@ -3,7 +3,7 @@ import * as httpStatus from 'http-status';
 import * as R from 'ramda';
 
 import { User } from 'models/userModel';
-import * as refreshTokenService from 'services/refreshToken';
+import * as refreshTokenService from 'shared/helpers/refreshToken';
 import { bind } from 'decko';
 
 export default class AuthController {
@@ -93,7 +93,6 @@ export default class AuthController {
     }
   }
 
-  @bind
   private async getUser(ctx: Context, selectQuery: string) {
     const { body: { email } } = ctx.request;
     const user = await User.findOne({ email }).select(selectQuery);
