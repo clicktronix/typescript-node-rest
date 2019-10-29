@@ -46,16 +46,16 @@ export const UserSchema = new Schema<IUserModel>({
     ref: 'Message',
   }],
 }, {
-    timestamps: true,
-    useNestedStrict: true,
-    versionKey: false,
-  },
+  timestamps: true,
+  useNestedStrict: true,
+  versionKey: false,
+},
 );
 
 /**
  * Password hash middleware
  */
-UserSchema.pre('save', async function() {
+UserSchema.pre('save', async function () {
   if (!(this as IUserModel).isModified('password')) { return; }
   try {
     const salt = await bcrypt.genSalt(SALT_ROUND);
@@ -69,21 +69,21 @@ UserSchema.pre('save', async function() {
 /**
  * Helper method for validating user's password
  */
-UserSchema.methods.comparePassword = function(pwd: string) {
+UserSchema.methods.comparePassword = function (pwd: string) {
   return bcrypt.compareSync(pwd, (this as IUserModel).password);
 };
 
 /**
  * Get full name method
  */
-UserSchema.virtual('fullName').get(function() {
+UserSchema.virtual('fullName').get(function () {
   return (this as IUserModel).name + ' ' + (this as IUserModel).surname;
 });
 
 /**
  * Helper method for getting jwt token
  */
-UserSchema.methods.getJWT = function() {
+UserSchema.methods.getJWT = function () {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
   return 'Bearer ' + jwt.sign({ id: (this as IUserModel)._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
 };
@@ -91,7 +91,7 @@ UserSchema.methods.getJWT = function() {
 /**
  * Helper method for getting jwt token
  */
-UserSchema.methods.getRefreshToken = function() {
+UserSchema.methods.getRefreshToken = function () {
   return R.last(this.tokens);
 };
 

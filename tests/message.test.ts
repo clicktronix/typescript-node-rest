@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { Response } from 'koa';
 import * as httpStatus from 'http-status';
 
+import { registerUser } from './helpers/auth';
 import { default as app } from '../src';
 
 const agent = require('supertest-koa-agent');
@@ -12,7 +13,9 @@ const userRequest = {
 };
 const messageRequest = {
   content: 'message',
-  to: 'userEmail@gmail.com',
+  owner: 'userEmail@gmail.com',
+  sender: 'userEmail@gmail.com',
+  onModel: 'User',
 };
 
 const INVALID_ID = '5c535bec1234352055129874';
@@ -25,11 +28,7 @@ describe('Message module', () => {
   before(async () => {
     try {
       server = agent(app);
-      await server.post('/register').send({
-        ...userRequest,
-        name: 'Name',
-        surname: 'Surname',
-      });
+      await registerUser(server, userRequest);
       userResponseData = await server.post('/authenticate').send(userRequest);
       await server.post('/messages')
         .send(messageRequest)

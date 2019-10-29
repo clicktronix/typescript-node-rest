@@ -2,10 +2,19 @@ import { default as socketIo } from 'socket.io';
 
 import { Chat, Message } from 'models';
 import { IMessageRequest } from 'shared/types/models';
+import { bind } from 'decko';
 
-export class ChatController {
-  constructor(private socket: socketIo.Socket) { }
+export class Socket {
+  constructor(private io: socketIo.Server) { }
 
+  public connect() {
+    this.io.of('/chat').on('connect', (socket: socketIo.Socket) => {
+      socket.on('message', this.handleMessage);
+      socket.on('disconnect', this.handleDisconnect);
+    });
+  }
+
+  @bind
   public async handleMessage(data: IMessageRequest) {
     const { chatId, message } = data;
     if (!chatId || !message) {
@@ -18,17 +27,18 @@ export class ChatController {
       }
       chat.messages.push(new Message(message));
       await chat.save();
-      this.socket.emit('message', data);
+      this.io.emit('message', data);
     } catch (err) {
       return this.handleError(err);
     }
   }
 
+  @bind
   public handleDisconnect() {
     console.log('Client disconnected');
   }
 
   private handleError(err: Error) {
-    this.socket.emit('error', err);
+    this.io.emit('error', err);
   }
 }

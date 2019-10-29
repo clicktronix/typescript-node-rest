@@ -51,6 +51,7 @@
     "@types/mongoose": "^5.5.22",
     "@types/ramda": "^0.26.33",
     "@types/socket.io": "^2.1.4",
+    "@types/socket.io-client": "^1.4.32",
     "@types/uuid": "^3.4.5",
     "bcrypt": "^3.0.6",
     "better-npm-run": "^0.1.1",
@@ -66,6 +67,7 @@
     "mongoose": "^5.7.5",
     "ramda": "^0.26.1",
     "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
     "supertest-koa-agent": "^0.3.2",
     "ts-node": "^8.4.1",
     "uuid": "^3.3.3"

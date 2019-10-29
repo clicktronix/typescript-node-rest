@@ -4,6 +4,7 @@ import * as httpStatus from 'http-status';
 import * as R from 'ramda';
 
 import { default as app } from '../src';
+import { registerUser } from './helpers/auth';
 
 const agent = require('supertest-koa-agent');
 
@@ -21,11 +22,7 @@ describe('User module', () => {
   before(async () => {
     try {
       server = agent(app);
-      await server.post('/register').send({
-        ...userRequest,
-        name: 'Name',
-        surname: 'Surname',
-      });
+      await registerUser(server, userRequest);
       userResponseData = await server.post('/authenticate').send(userRequest);
     } catch (err) {
       console.error(err);

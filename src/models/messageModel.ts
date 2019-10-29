@@ -15,7 +15,7 @@ const MessageSchema = new Schema<IMessageModel>({
   },
   sender: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    refPath: 'onModel',
   },
   onModel: {
     type: String,

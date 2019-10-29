@@ -14,7 +14,7 @@ export class MessageController {
    */
   public async getMessages(ctx: Context) {
     try {
-      const messages = await Message.find().populate('user', 'email');
+      const messages = await Message.find({});
       ctx.status = httpStatus.OK;
       ctx.body = {
         data: messages || [],
@@ -54,12 +54,13 @@ export class MessageController {
     try {
       const usersMeta = this.decodeToken(headers.authorization);
       const sender = await User.findById(usersMeta.id);
-      const owner = await User.findOne({ email: body.to });
+      const owner = await User.findOne({ email: body.owner });
       if (!sender || !owner) {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
       const message = new Message({
         content: body.content,
+        onModel: body.onModel,
         sender,
         owner,
       });

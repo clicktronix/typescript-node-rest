@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import * as httpStatus from 'http-status';
 
 import { CONFIG } from 'config';
+import { registerUser } from './helpers/auth';
 import { default as app } from '../src';
 
 const agent = require('supertest-koa-agent');
@@ -17,11 +18,7 @@ describe('Auth module', () => {
   before(async () => {
     try {
       server = agent(app);
-      await server.post('/register').send({
-        ...userRequest,
-        name: 'Name',
-        surname: 'Surname',
-      });
+      await registerUser(server, userRequest);
     } catch (err) {
       console.error(err);
     }
