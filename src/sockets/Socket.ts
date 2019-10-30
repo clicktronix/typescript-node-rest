@@ -1,7 +1,6 @@
 import { default as socketIo } from 'socket.io';
 
-import { Chat, Message } from 'models';
-import { IMessageRequest } from 'shared/types/models';
+import { Chat, Message, IMessageRequest } from 'models';
 import { bind } from 'decko';
 
 export class Socket {

@@ -4,7 +4,22 @@ import * as jwt from 'jsonwebtoken';
 import * as R from 'ramda';
 
 import { CONFIG } from 'config';
-import { IUserModel } from 'shared/types/models';
+import { IMessageModel } from './messageModel';
+
+export interface IUser {
+  email: string;
+  name: string;
+  surname: string;
+  password: string;
+  tokens: string[];
+  messages: IMessageModel[];
+}
+
+export interface IUserModel extends IUser, mongoose.Document {
+  comparePassword(pwd: string): boolean;
+  getJWT(): string;
+  getRefreshToken(): string | undefined;
+}
 
 const Schema = mongoose.Schema;
 const SALT_ROUND = 10;

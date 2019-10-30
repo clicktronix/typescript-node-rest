@@ -1,5 +1,9 @@
 import * as mongoose from 'mongoose';
-import { IChatModel } from 'shared/types/models';
+import { IMessageModel } from './messageModel';
+
+export interface IChat {
+  messages: IMessageModel[];
+}
 
 const Schema = mongoose.Schema;
 
@@ -11,4 +15,5 @@ const ChatSchema = new Schema<IChatModel>({
   }],
 });
 
+export interface IChatModel extends IChat, mongoose.Document { }
 export const Chat = mongoose.model<IChatModel>('Chat', ChatSchema);

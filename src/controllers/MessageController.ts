@@ -3,10 +3,9 @@ import * as httpStatus from 'http-status';
 import * as jwt from 'jsonwebtoken';
 import { bind } from 'decko';
 
-import { Message, User } from 'models';
+import { Message, User, IUserModel } from 'models';
 import { CONFIG } from 'config';
 import { isString } from 'shared/types/guards';
-import { IUserModel } from 'shared/types/models';
 
 export class MessageController {
   /**

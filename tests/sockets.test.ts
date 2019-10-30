@@ -31,9 +31,21 @@ describe('Socket server', () => {
     client.close();
   });
 
-  describe('connect', () => {
-    it('should connect socket', async () => {
+  describe('Connect', () => {
+    it('Should connect socket', async () => {
       client.on('connect', () => {
+        expect(client.connected).to.equal(true);
+        client.disconnect();
+      });
+    });
+  });
+
+  describe('Message', () => {
+    it('Should connect socket', async () => {
+      client.emit('message', {
+        message: 'test message',
+      });
+      client.on('message', () => {
         expect(client.connected).to.equal(true);
         client.disconnect();
       });
