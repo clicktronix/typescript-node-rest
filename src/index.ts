@@ -28,4 +28,7 @@ class App {
 }
 
 export { App };
-export default new App().app.listen(CONFIG.port, () => console.log(`Server is listening on port ${CONFIG.port}`));
+export default new App().app.listen(
+  CONFIG.port,
+  () => console.log(`Server is listening on port ${CONFIG.port}`),
+);

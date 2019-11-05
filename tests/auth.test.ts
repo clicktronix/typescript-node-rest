@@ -1,9 +1,9 @@
 import { expect } from 'chai';
+import supertest from 'supertest';
 import * as httpStatus from 'http-status';
 
 import { CONFIG } from 'config';
 import { registerUser } from './helpers/auth';
-import supertest from 'supertest';
 import app from '../src';
 
 const userRequest = {
@@ -12,7 +12,7 @@ const userRequest = {
 };
 
 describe('Auth module', () => {
-  let server: any;
+  let server: supertest.SuperTest<supertest.Test>;
 
   before(async () => {
     try {
