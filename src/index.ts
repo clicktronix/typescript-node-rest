@@ -10,15 +10,12 @@ import { CONFIG } from './config';
 class App {
   public app: Koa;
   private db: DataBase;
-  private io: socketIo.Server;
   private socketServer: Socket;
 
   constructor() {
     this.app = new Koa();
     this.db = new DataBase();
-    this.io = socketIo(this.app);
-    this.socketServer = new Socket(this.io);
-    this.app.listen(CONFIG.port, () => console.log(`Server is listening on port ${CONFIG.port}`));
+    this.socketServer = new Socket(socketIo(this.app));
     this.socketServer.connect();
     this.db.connect();
     this.setMiddlewares();
@@ -31,4 +28,4 @@ class App {
 }
 
 export { App };
-export default new App().app;
+export default new App().app.listen(CONFIG.port, () => console.log(`Server is listening on port ${CONFIG.port}`));

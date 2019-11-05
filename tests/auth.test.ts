@@ -3,9 +3,8 @@ import * as httpStatus from 'http-status';
 
 import { CONFIG } from 'config';
 import { registerUser } from './helpers/auth';
-import { default as app } from '../src';
-
-const agent = require('supertest-koa-agent');
+import supertest from 'supertest';
+import app from '../src';
 
 const userRequest = {
   email: 'authEmail@gmail.com',
@@ -17,15 +16,11 @@ describe('Auth module', () => {
 
   before(async () => {
     try {
-      server = agent(app);
+      server = supertest(app);
       await registerUser(server, userRequest);
     } catch (err) {
       console.error(err);
     }
-  });
-
-  after(() => {
-    server.app.close();
   });
 
   describe('/authenticate', () => {
