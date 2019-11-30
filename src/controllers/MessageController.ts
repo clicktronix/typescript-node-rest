@@ -1,11 +1,9 @@
 import { Context } from 'koa';
 import * as httpStatus from 'http-status';
-import * as jwt from 'jsonwebtoken';
 import { bind } from 'decko';
 
 import { Message, User, IUserModel } from 'models';
-import { CONFIG } from 'config';
-import { isString } from 'shared/types/guards';
+import { decodeToken } from 'shared/helpers/decodeToken';
 
 export class MessageController {
   /**
@@ -30,7 +28,7 @@ export class MessageController {
   public async getMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {
-      const usersMeta = this.decodeToken(headers.authorization);
+      const usersMeta = decodeToken(headers.authorization);
       const message = await this.findMessage(ctx, usersMeta);
       if (!message) {
         return ctx.throw(httpStatus.NOT_FOUND, 'Message not found');
@@ -51,7 +49,7 @@ export class MessageController {
   public async postMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
-      const usersMeta = this.decodeToken(headers.authorization);
+      const usersMeta = decodeToken(headers.authorization);
       const sender = await User.findById(usersMeta.id);
       const owner = await User.findOne({ email: body.owner });
       if (!sender || !owner) {
@@ -78,7 +76,7 @@ export class MessageController {
   public async updateMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
-      const usersMeta = this.decodeToken(headers.authorization);
+      const usersMeta = decodeToken(headers.authorization);
       const message = await this.findMessage(ctx, usersMeta);
       if (message) {
         message.content = body.content;
@@ -97,7 +95,7 @@ export class MessageController {
   public async deleteMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {
-      const usersMeta = this.decodeToken(headers.authorization);
+      const usersMeta = decodeToken(headers.authorization);
       const message = await this.findMessage(ctx, usersMeta);
       message && await message.remove();
       ctx.status = httpStatus.OK;
@@ -120,14 +118,5 @@ export class MessageController {
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
-  }
-
-  private decodeToken(usersToken: string) {
-    const token = usersToken.replace('Bearer ', '');
-    const decoded = jwt.verify(token, CONFIG.jwt_encryption);
-    if (!decoded || isString(decoded)) {
-      throw new Error('Invalid token');
-    }
-    return decoded as IUserModel;
   }
 }

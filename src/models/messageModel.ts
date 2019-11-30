@@ -8,11 +8,6 @@ export interface IMessage {
   owner: IUserModel | IChatModel;
 }
 
-export interface IMessageRequest {
-  chatId: string;
-  message: IMessage;
-}
-
 const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema<IMessageModel>({
