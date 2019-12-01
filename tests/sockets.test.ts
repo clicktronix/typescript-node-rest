@@ -4,6 +4,8 @@ import { default as ioServer } from 'socket.io';
 
 import { Socket } from 'sockets';
 import { IMessage } from 'models';
+import { CONFIG } from 'config';
+import { SOCKET_MESSAGE, SOCKET_ERROR, SOCKET_CONNECT } from 'sockets/constants';
 
 const messageRequest = {
   content: 'message',
@@ -17,10 +19,10 @@ describe('Socket module', () => {
   let client: SocketIOClient.Socket;
 
   beforeEach(() => {
-    server = ioServer.listen(3000);
+    server = ioServer.listen(CONFIG.test_socket_port);
     socket = new Socket(server);
     socket.connect();
-    client = ioClient.connect(`http://localhost:${3000}`, {
+    client = ioClient.connect(`http://localhost:${CONFIG.test_socket_port}`, {
       transports: ['websocket'],
       forceNew: true,
     });
@@ -32,15 +34,15 @@ describe('Socket module', () => {
   });
 
   it('Socket client should be connected', (done) => {
-    client.on('connect', () => {
+    client.on(SOCKET_CONNECT, () => {
       expect(client.connected).to.equal(true);
       done();
     });
   });
 
   it('Should send message for client', (done) => {
-    client.on('connect', () => {
-      client.on('message', (req: IMessage) => {
+    client.on(SOCKET_CONNECT, () => {
+      client.on(SOCKET_MESSAGE, (req: IMessage) => {
         expect(req).to.deep.equal({
           content: 'message',
           sender: 'userEmail@gmail.com',
@@ -49,7 +51,21 @@ describe('Socket module', () => {
         done();
       });
 
-      client.emit('message', messageRequest);
+      client.emit(SOCKET_MESSAGE, messageRequest);
+    });
+  });
+
+  it('Should send error for client if message does not exist', (done) => {
+    client.on(SOCKET_CONNECT, () => {
+      client.on(SOCKET_ERROR, (req: string) => {
+        expect(req).to.be.an('string');
+        done();
+      });
+
+      client.emit(SOCKET_MESSAGE, {
+        ...messageRequest,
+        content: '',
+      });
     });
   });
 });

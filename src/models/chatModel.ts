@@ -3,14 +3,14 @@ import { IMessageModel } from './messageModel';
 
 export interface IChat {
   messages: IMessageModel[];
-  type?: 'main' | 'personal';
+  type?: 'main-chat' | 'private-chat';
 }
 
 const Schema = mongoose.Schema;
 
 const ChatSchema = new Schema<IChatModel>({
   id: Schema.Types.ObjectId,
-  type: { type: String, default: 'personal' },
+  type: { type: String, default: 'private-chat' },
   messages: [{
     type: Schema.Types.ObjectId,
     ref: 'Message',

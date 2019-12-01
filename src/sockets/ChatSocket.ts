@@ -2,28 +2,32 @@ import { default as socketIo } from 'socket.io';
 import { bind } from 'decko';
 
 import { Chat, Message, IMessage } from 'models';
+import { SOCKET_MESSAGE, SOCKET_ERROR } from './constants';
 
 export class ChatSocket {
   constructor(private io: socketIo.Server) { }
 
   @bind
   public async connect(socket: socketIo.Socket) {
-    socket.on('message', this.handleMessage);
-    socket.on('disconnect', this.handleDisconnect);
-    await this.checkMainChat();
+    socket.on(SOCKET_MESSAGE, this.handleMessage);
+    try {
+      await this.checkMainChat();
+    } catch (error) {
+      this.handleError(error.message);
+    }
   }
 
   @bind
   public async handleMessage(data: IMessage) {
     const { sender, owner, content } = data;
     if (!content) {
-      this.handleError(new Error('Please enter a message'));
+      this.handleError('Please enter a message');
       return;
     }
     try {
-      const chat = await Chat.find({ type: 'main' });
+      const chat = await Chat.find({ type: 'main-chat' });
       if (!chat) {
-        this.handleError(new Error('Chat not found'));
+        this.handleError('Chat not found');
         return;
       }
       chat[0].messages.push(new Message({
@@ -34,29 +38,25 @@ export class ChatSocket {
       await chat[0].save();
       this.io.emit('message', data);
     } catch (error) {
-      this.handleError(error);
+      this.handleError(error.message);
     }
   }
 
   @bind
-  public handleDisconnect() {
-    console.log('Client disconnected');
-  }
-
-  private handleError(error: Error) {
-    this.io.emit('error', error);
+  private handleError(error: string) {
+    this.io.emit(SOCKET_ERROR, error);
   }
 
   private async checkMainChat() {
     try {
-      const isChatExist = await Chat.exists({ type: 'main' });
+      const isChatExist = await Chat.exists({ type: 'main-chat' });
       if (!isChatExist) {
-        const chat = new Chat({ type: 'main', messages: [] });
+        const chat = new Chat({ type: 'main-chat', messages: [] });
         await chat.save();
       }
       return;
     } catch (error) {
-      this.handleError(error);
+      this.handleError(error.message);
     }
   }
 }
