@@ -1,6 +1,8 @@
 import { default as Koa } from 'koa';
 import { default as bodyParser } from 'koa-bodyparser';
+import { default as socketIo } from 'socket.io';
 
+import { Socket } from 'sockets';
 import { router } from './routes';
 import { DataBase } from './data';
 import { CONFIG } from './config';
@@ -8,11 +10,13 @@ import { CONFIG } from './config';
 class App {
   public app: Koa;
   private db: DataBase;
+  private socketServer: Socket;
 
   constructor() {
     this.app = new Koa();
     this.db = new DataBase();
-    this.app.listen(CONFIG.port, () => console.log(`Server is listening on ${CONFIG.port}`));
+    this.socketServer = new Socket(socketIo(this.app));
+    this.socketServer.connect();
     this.db.connect();
     this.setMiddlewares();
   }
@@ -24,4 +28,7 @@ class App {
 }
 
 export { App };
-export default new App().app;
+export default new App().app.listen(
+  CONFIG.port,
+  () => console.log(`Server is listening on port ${CONFIG.port}`),
+);

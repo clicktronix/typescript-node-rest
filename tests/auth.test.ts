@@ -1,10 +1,10 @@
 import { expect } from 'chai';
+import supertest from 'supertest';
 import * as httpStatus from 'http-status';
 
 import { CONFIG } from 'config';
-import { default as app } from '../src';
-
-const agent = require('supertest-koa-agent');
+import { registerUser } from './helpers/auth';
+import app from '../src';
 
 const userRequest = {
   email: 'authEmail@gmail.com',
@@ -12,23 +12,15 @@ const userRequest = {
 };
 
 describe('Auth module', () => {
-  let server: any;
+  let server: supertest.SuperTest<supertest.Test>;
 
   before(async () => {
     try {
-      server = agent(app);
-      await server.post('/register').send({
-        ...userRequest,
-        name: 'Name',
-        surname: 'Surname',
-      });
+      server = supertest(app);
+      await registerUser(server, userRequest);
     } catch (err) {
       console.error(err);
     }
-  });
-
-  after(() => {
-    server.app.close();
   });
 
   describe('/authenticate', () => {

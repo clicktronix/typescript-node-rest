@@ -1,5 +1,8 @@
 import * as R from 'ramda';
 import * as uuid from 'uuid';
+import * as httpStatus from 'http-status';
+
+import { HttpRequestError } from './HttpRequestError';
 
 export function add(tokens: string[] = []) {
   const newToken = uuid.v4();
@@ -12,7 +15,7 @@ export function add(tokens: string[] = []) {
 
 export function update(tokens: string[], token: string) {
   if (R.indexOf(token, tokens) === -1) {
-    return Error('Token is invalid');
+    throw new HttpRequestError('Token is invalid', httpStatus.UNAUTHORIZED);
   }
   const updatedTokens = R.without([token], tokens);
   return add(updatedTokens);
@@ -20,7 +23,7 @@ export function update(tokens: string[], token: string) {
 
 export function remove(tokens: string[], token: string) {
   if (R.indexOf(token, tokens) === -1) {
-    return Error('Token is invalid');
+    throw new HttpRequestError('Token is invalid', httpStatus.UNAUTHORIZED);
   }
   return R.without([token], tokens);
 }
