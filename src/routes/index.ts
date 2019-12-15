@@ -1,34 +1,34 @@
-import { default as Router } from 'koa-router';
-import { default as jwtMiddleware } from 'koa-jwt';
+import Router from 'koa-router';
+import jwtMiddleware from 'koa-jwt';
 
 import { UserController, AuthController, MessageController } from 'controllers';
 import { CONFIG } from 'config';
 
+import {
+  ROUTE_REGISTER, ROUTE_AUTH, ROUTE_REFRESH_TOKEN, ROUTE_LOGOUT, ROUTE_USERS, ROUTE_USERS_ID,
+  ROUTE_MESSAGES, ROUTE_MESSAGES_ID,
+} from './constants';
+
 const router = new Router();
-const userController: UserController = new UserController();
-const authController: AuthController = new AuthController();
-const messageController: MessageController = new MessageController();
 
 // Public routes
-router.post('/register', authController.registerNewUser);
-router.post('/authenticate', authController.authenticate);
+router.post(ROUTE_REGISTER, AuthController.registerNewUser);
+router.post(ROUTE_AUTH, AuthController.authenticate);
 
 // Private routes
-router.use(jwtMiddleware({
-  secret: CONFIG.jwt_encryption,
-}));
-router.post('/authenticate/refresh', authController.refreshAccessToken);
-router.post('/logout', authController.logout);
+router.use(jwtMiddleware({ secret: CONFIG.jwt_encryption }));
+router.post(ROUTE_REFRESH_TOKEN, AuthController.refreshAccessToken);
+router.post(ROUTE_LOGOUT, AuthController.logout);
 
-router.get('/users', userController.getUsers);
-router.get('/users/:userId', userController.getUserById);
-router.put('/users', userController.updateUser);
-router.delete('/users/:userId', userController.deleteUser);
+router.get(ROUTE_USERS, UserController.getUsers);
+router.get(ROUTE_USERS_ID, UserController.getUserById);
+router.put(ROUTE_USERS, UserController.updateUser);
+router.delete(ROUTE_USERS_ID, UserController.deleteUser);
 
-router.get('/messages', messageController.getMessages);
-router.post('/messages', messageController.postMessage);
-router.patch('/messages/:messageId', messageController.updateMessage);
-router.delete('/messages/:messageId', messageController.deleteMessage);
-router.get('/messages/:messageId', messageController.getMessage);
+router.get(ROUTE_MESSAGES, MessageController.getMessages);
+router.post(ROUTE_MESSAGES, MessageController.postMessage);
+router.patch(ROUTE_MESSAGES_ID, MessageController.updateMessage);
+router.delete(ROUTE_MESSAGES_ID, MessageController.deleteMessage);
+router.get(ROUTE_MESSAGES_ID, MessageController.getMessage);
 
 export { router };

@@ -1,16 +1,16 @@
 import { Context } from 'koa';
 import * as httpStatus from 'http-status';
 import * as R from 'ramda';
+import { bind } from 'decko';
 
 import { User } from 'models/userModel';
 import * as refreshTokenService from 'shared/helpers/refreshToken';
-import { bind } from 'decko';
 
 export class AuthController {
   /**
    * POST /register
    */
-  public async registerNewUser(ctx: Context) {
+  public static async registerNewUser(ctx: Context) {
     const { body } = ctx.request;
     try {
       const newUser = new User(body);
@@ -29,10 +29,10 @@ export class AuthController {
    * Sign in using email and password
    */
   @bind
-  public async authenticate(ctx: Context) {
+  public static async authenticate(ctx: Context) {
     const { body } = ctx.request;
     try {
-      const user = await this.getUser(ctx, '+password +tokens');
+      const user = await AuthController.getUser(ctx, '+password +tokens');
       if (!user.comparePassword(body.password)) {
         return ctx.throw(httpStatus.UNAUTHORIZED, 'Wrong password');
       }
@@ -55,10 +55,10 @@ export class AuthController {
    * POST /logout
    */
   @bind
-  public async logout(ctx: Context) {
+  public static async logout(ctx: Context) {
     const { body: { refreshToken } } = ctx.request;
     try {
-      const user = await this.getUser(ctx, '+tokens');
+      const user = await AuthController.getUser(ctx, '+tokens');
       const updatedTokens = refreshTokenService.remove(user.tokens, refreshToken);
       user.tokens = updatedTokens;
       user.save();
@@ -73,10 +73,10 @@ export class AuthController {
    * POST /authenticate/refresh
    */
   @bind
-  public async refreshAccessToken(ctx: Context) {
+  public static async refreshAccessToken(ctx: Context) {
     const { body: { refreshToken } } = ctx.request;
     try {
-      const user = await this.getUser(ctx, '+tokens');
+      const user = await AuthController.getUser(ctx, '+tokens');
       const updatedTokens = refreshTokenService.update(user.tokens, refreshToken);
       user.tokens = updatedTokens;
       user.save();
@@ -92,9 +92,9 @@ export class AuthController {
     }
   }
 
-  private async getUser(ctx: Context, selectQuery: string) {
+  private static async getUser(ctx: Context, selectQuery: string) {
     const { body: { email } } = ctx.request;
     const user = await User.findOne({ email }).select(selectQuery);
-    return user ? user : ctx.throw(httpStatus.NOT_FOUND, 'User not found');
+    return user || ctx.throw(httpStatus.NOT_FOUND, 'User not found');
   }
 }

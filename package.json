@@ -7,7 +7,8 @@
     "build": "tsc",
     "dev": "better-npm-run dev",
     "test": "better-npm-run test",
-    "check-types": "node_modules/.bin/tsc -p . --noEmit -w"
+    "check-types": "node_modules/.bin/tsc -p . --noEmit -w",
+    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts}' --quiet --fix"
   },
   "betterScripts": {
     "dev": {
@@ -28,18 +29,6 @@
   "author": "Vladislav Manakov",
   "license": "MIT",
   "devDependencies": {
-    "@types/chai": "^4.2.3",
-    "@types/mocha": "^5.2.7",
-    "chai": "^4.2.0",
-    "mocha": "^5.2.0",
-    "mongodb-memory-server": "^5.2.8",
-    "nodemon": "^1.19.4",
-    "supertest": "^4.0.2",
-    "tslint": "^5.20.0",
-    "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.6.4"
-  },
-  "dependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/chalk": "^2.2.0",
     "@types/dotenv": "^6.1.1",
@@ -55,6 +44,24 @@
     "@types/socket.io-client": "^1.4.32",
     "@types/supertest": "^2.0.8",
     "@types/uuid": "^3.4.5",
+    "@types/chai": "^4.2.3",
+    "@types/mocha": "^5.2.7",
+    "@typescript-eslint/eslint-plugin": "^2.11.0",
+    "@typescript-eslint/parser": "^2.11.0",
+    "chai": "^4.2.0",
+    "eslint": "^6.7.2",
+    "eslint-config-airbnb-typescript": "^6.3.1",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-prettier": "^3.1.1",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.19.4",
+    "prettier": "^1.19.1",
+    "supertest": "^4.0.2",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {
     "bcrypt": "^3.0.6",
     "better-npm-run": "^0.1.1",
     "chalk": "^2.4.2",
@@ -66,11 +73,24 @@
     "koa-bodyparser": "^4.2.1",
     "koa-jwt": "^3.6.0",
     "koa-router": "^7.4.0",
+    "lint-staged": "^9.5.0",
+    "mongodb-memory-server": "^5.2.11",
     "mongoose": "^5.7.5",
     "ramda": "^0.26.1",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "ts-node": "^8.4.1",
     "uuid": "^3.3.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsc --noEmit && lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix",
+      "git add"
+    ]
   }
 }

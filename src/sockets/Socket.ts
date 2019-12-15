@@ -1,4 +1,5 @@
-import { default as socketIo } from 'socket.io';
+import socketIo from 'socket.io';
+
 import { ChatSocket } from './ChatSocket';
 import { SOCKET_CONNECT } from './constants';
 

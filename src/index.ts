@@ -1,8 +1,9 @@
-import { default as Koa } from 'koa';
-import { default as bodyParser } from 'koa-bodyparser';
-import { default as socketIo } from 'socket.io';
+import Koa from 'koa';
+import bodyParser from 'koa-bodyparser';
+import socketIo from 'socket.io';
 
 import { Socket } from 'sockets';
+
 import { router } from './routes';
 import { DataBase } from './data';
 import { CONFIG } from './config';
@@ -28,7 +29,7 @@ class App {
 }
 
 export { App };
-export default new App().app.listen(
+export const app = new App().app.listen(
   CONFIG.port,
-  () => console.log(`Server is listening on port ${CONFIG.port}`),
+  () => console.info(`Server is listening on port ${CONFIG.port}`),
 );

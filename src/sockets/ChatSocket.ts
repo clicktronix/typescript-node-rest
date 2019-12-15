@@ -1,7 +1,8 @@
-import { default as socketIo } from 'socket.io';
 import { bind } from 'decko';
+import socketIo from 'socket.io';
 
-import { Chat, Message, IMessage } from 'models';
+import { Chat, Message } from 'models';
+
 import { SOCKET_MESSAGE, SOCKET_ERROR } from './constants';
 
 export class ChatSocket {
@@ -18,7 +19,7 @@ export class ChatSocket {
   }
 
   @bind
-  public async handleMessage(data: IMessage) {
+  public async handleMessage(data: Message) {
     const { sender, owner, content } = data;
     if (!content) {
       this.handleError('Please enter a message');
@@ -30,11 +31,13 @@ export class ChatSocket {
         this.handleError('Chat not found');
         return;
       }
-      chat[0].messages.push(new Message({
-        content,
-        owner,
-        sender,
-      }));
+      chat[0].messages.push(
+        new Message({
+          content,
+          owner,
+          sender,
+        }),
+      );
       await chat[0].save();
       this.io.emit('message', data);
     } catch (error) {
@@ -51,7 +54,10 @@ export class ChatSocket {
     try {
       const isChatExist = await Chat.exists({ type: 'main-chat' });
       if (!isChatExist) {
-        const chat = new Chat({ type: 'main-chat', messages: [] });
+        const chat = new Chat({
+          type: 'main-chat',
+          messages: [],
+        });
         await chat.save();
       }
       return;
