@@ -3,6 +3,8 @@ import { Response } from 'koa';
 import * as httpStatus from 'http-status';
 import supertest from 'supertest';
 
+import { ROUTE_AUTH, ROUTE_MESSAGES } from 'routes/constants';
+
 import { registerUser } from './helpers/auth';
 import { app } from '../src';
 
@@ -28,21 +30,21 @@ describe('Message module', () => {
     try {
       server = supertest(app);
       await registerUser(server, userRequest);
-      userResponseData = await server.post('/authenticate').send(userRequest);
-      await server.post('/messages')
+      userResponseData = await server.post(ROUTE_AUTH).send(userRequest);
+      await server.post(ROUTE_MESSAGES)
         .send(messageRequest)
         .set('Authorization', userResponseData.body.token.accessToken);
-      messagesResponseData = await server.get('/messages')
+      messagesResponseData = await server.get(ROUTE_MESSAGES)
         .set('Authorization', userResponseData.body.token.accessToken);
     } catch (err) {
       console.error(err);
     }
   });
 
-  describe('/messages', () => {
+  describe(ROUTE_MESSAGES, () => {
     it('Should get messages', async () => {
       const res = await server
-        .get('/messages')
+        .get(ROUTE_MESSAGES)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
@@ -52,7 +54,7 @@ describe('Message module', () => {
 
     it('Should return message by id', async () => {
       const res = await server
-        .get(`/messages/${messagesResponseData.body.data[0]._id}`)
+        .get(`${ROUTE_MESSAGES}/${messagesResponseData.body.data[0]._id}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
@@ -60,7 +62,7 @@ describe('Message module', () => {
 
     it('Should return error if message id is invalid', async () => {
       const res = await server
-        .get(`/messages/${INVALID_ID}`)
+        .get(`${ROUTE_MESSAGES}/${INVALID_ID}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
@@ -69,7 +71,7 @@ describe('Message module', () => {
 
     it('Should return error if access token is invalid', async () => {
       const res = await server
-        .get(`/messages/${messagesResponseData.body.data[0]._id}`)
+        .get(`${ROUTE_MESSAGES}/${messagesResponseData.body.data[0]._id}`)
         .set('Authorization', INVALID_ID);
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
@@ -78,7 +80,7 @@ describe('Message module', () => {
 
     it('Should add new message', async () => {
       const res = await server
-        .post('/messages')
+        .post(ROUTE_MESSAGES)
         .send(messageRequest)
         .set('Authorization', userResponseData.body.token.accessToken);
 
@@ -87,7 +89,7 @@ describe('Message module', () => {
 
     it('Should return error if access token is invalid, when a message is added', async () => {
       const res = await server
-        .patch(`/messages/${messagesResponseData.body.data[0]._id}`)
+        .patch(`${ROUTE_MESSAGES}/${messagesResponseData.body.data[0]._id}`)
         .send(messageRequest)
         .set('Authorization', INVALID_ID);
 
@@ -97,7 +99,7 @@ describe('Message module', () => {
 
     it('Should return error if message id is invalid, when a message is added', async () => {
       const res = await server
-        .patch(`/messages/${INVALID_ID}`)
+        .patch(`${ROUTE_MESSAGES}/${INVALID_ID}`)
         .send(messageRequest)
         .set('Authorization', userResponseData.body.token.accessToken);
 
@@ -107,7 +109,7 @@ describe('Message module', () => {
 
     it('Should add new message', async () => {
       const res = await server
-        .post('/messages')
+        .post(ROUTE_MESSAGES)
         .send(messageRequest)
         .set('Authorization', userResponseData.body.token.accessToken);
 
@@ -116,7 +118,7 @@ describe('Message module', () => {
 
     it('Should return error if access token is invalid, when the message is updated', async () => {
       const res = await server
-        .patch(`/messages/${messagesResponseData.body.data[0]._id}`)
+        .patch(`${ROUTE_MESSAGES}/${messagesResponseData.body.data[0]._id}`)
         .send(messageRequest)
         .set('Authorization', INVALID_ID);
 
@@ -126,7 +128,7 @@ describe('Message module', () => {
 
     it('Should return error if message id is invalid, when the message is updated', async () => {
       const res = await server
-        .patch(`/messages/${INVALID_ID}`)
+        .patch(`${ROUTE_MESSAGES}/${INVALID_ID}`)
         .send(messageRequest)
         .set('Authorization', userResponseData.body.token.accessToken);
 
@@ -142,15 +144,15 @@ describe('Message module', () => {
         onModel: 'User',
       };
       await server
-        .post('/messages')
+        .post(ROUTE_MESSAGES)
         .send(newMessage)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       const messages = await server
-        .get('/messages')
+        .get(ROUTE_MESSAGES)
         .set('Authorization', userResponseData.body.token.accessToken);
       const res = await server
-        .delete(`/users/${messages.body.data[1]._id}`)
+        .delete(`${ROUTE_MESSAGES}/${messages.body.data[1]._id}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NO_CONTENT);
@@ -158,10 +160,10 @@ describe('Message module', () => {
 
     it('Should throw error if the message id being deleted does not exist', async () => {
       const res = await server
-        .delete('/messages')
+        .delete(`${ROUTE_MESSAGES}/${INVALID_ID}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
-      expect(res.status).to.equal(httpStatus.METHOD_NOT_ALLOWED);
+      expect(res.status).to.equal(httpStatus.NOT_FOUND);
       expect(res.error.message).to.be.an('string');
     });
   });

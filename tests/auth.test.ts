@@ -3,6 +3,9 @@ import supertest from 'supertest';
 import * as httpStatus from 'http-status';
 
 import { CONFIG } from 'config';
+import {
+  ROUTE_AUTH, ROUTE_LOGOUT, ROUTE_USERS, ROUTE_REFRESH_TOKEN, ROUTE_REGISTER,
+} from 'routes/constants';
 
 import { registerUser } from './helpers/auth';
 import { app } from '../src';
@@ -24,9 +27,9 @@ describe('Auth module', () => {
     }
   });
 
-  describe('/authenticate', () => {
+  describe(ROUTE_AUTH, () => {
     it('Should successfully login user', async () => {
-      const res = await server.post('/authenticate').send(userRequest);
+      const res = await server.post(ROUTE_AUTH).send(userRequest);
 
       expect(res.status).to.equal(httpStatus.OK);
       expect(res.body.data).to.be.an('object');
@@ -35,7 +38,7 @@ describe('Auth module', () => {
     });
 
     it('Should return 403, if password is wrong', async () => {
-      const res = await server.post('/authenticate').send({
+      const res = await server.post(ROUTE_AUTH).send({
         ...userRequest,
         password: 'INVALID',
       });
@@ -45,7 +48,7 @@ describe('Auth module', () => {
     });
 
     it('Should return 404, if user does not exist', async () => {
-      const res = await server.post('/authenticate').send({
+      const res = await server.post(ROUTE_AUTH).send({
         ...userRequest,
         email: 'INVALID',
       });
@@ -55,23 +58,23 @@ describe('Auth module', () => {
     });
 
     it('Should return 404, if email is empty', async () => {
-      const res = await server.post('/authenticate').send({ password: '12345' });
+      const res = await server.post(ROUTE_AUTH).send({ password: '12345' });
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
       expect(res.error.message).to.be.an('string');
     });
 
     it('Should return 404, if password is empty', async () => {
-      const res = await server.post('/authenticate').send({ email: 'mail' });
+      const res = await server.post(ROUTE_AUTH).send({ email: 'mail' });
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
       expect(res.error.message).to.be.an('string');
     });
 
     it('Should set invalid refresh token after logout', async () => {
-      const user = await server.post('/authenticate').send(userRequest);
+      const user = await server.post(ROUTE_AUTH).send(userRequest);
       const res = await server
-        .post('/logout')
+        .post(ROUTE_LOGOUT)
         .set('Authorization', `${user.body.token.accessToken}`)
         .send({
           email: user.body.data.email,
@@ -85,9 +88,9 @@ describe('Auth module', () => {
     it('Should return 401 on expired token', async () => {
       const expiration = CONFIG.jwt_expiration;
       CONFIG.jwt_expiration = '0';
-      const user = await server.post('/authenticate').send(userRequest);
+      const user = await server.post(ROUTE_AUTH).send(userRequest);
       const res = await server
-        .get('/users')
+        .get(ROUTE_USERS)
         .set('Authorization', user.body.token.accessToken);
       CONFIG.jwt_expiration = expiration;
 
@@ -95,11 +98,11 @@ describe('Auth module', () => {
     });
   });
 
-  describe('/authenticate/refresh', () => {
+  describe(ROUTE_REFRESH_TOKEN, () => {
     it('Should set new access token using refresh token', async () => {
-      const user = await server.post('/authenticate').send(userRequest);
+      const user = await server.post(ROUTE_AUTH).send(userRequest);
       const res = await server
-        .post('/authenticate/refresh')
+        .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${user.body.token.accessToken}`)
         .send({
           email: user.body.data.email,
@@ -112,9 +115,9 @@ describe('Auth module', () => {
     });
 
     it('Should return 403 on invalid refresh token', async () => {
-      const user = await server.post('/authenticate').send(userRequest);
+      const user = await server.post(ROUTE_AUTH).send(userRequest);
       const res = await server
-        .post('/authenticate/refresh')
+        .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${user.body.token.accessToken}`)
         .send({
           email: user.body.data.email,
@@ -126,9 +129,9 @@ describe('Auth module', () => {
     });
 
     it('Should use refresh token only once', async () => {
-      const user = await server.post('/authenticate').send(userRequest);
+      const user = await server.post(ROUTE_AUTH).send(userRequest);
       const firstRes = await server
-        .post('/authenticate/refresh')
+        .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${user.body.token.accessToken}`)
         .send({
           email: user.body.data.email,
@@ -140,7 +143,7 @@ describe('Auth module', () => {
       expect(firstRes.body.token.refreshToken).to.be.an('string');
 
       const secondRes = await server
-        .post('/authenticate/refresh')
+        .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${user.body.token.accessToken}`)
         .send({
           email: user.body.data.email,
@@ -152,21 +155,21 @@ describe('Auth module', () => {
     });
 
     it('Must be valid multiple refresh tokens', async () => {
-      const firstRes = await server.post('/authenticate').send(userRequest);
-      const secondRes = await server.post('/authenticate').send(userRequest);
+      const firstRes = await server.post(ROUTE_AUTH).send(userRequest);
+      const secondRes = await server.post(ROUTE_AUTH).send(userRequest);
 
       expect(firstRes.status).to.equal(httpStatus.OK);
       expect(secondRes.status).to.equal(httpStatus.OK);
 
       const firstRefreshTokenRes = await server
-        .post('/authenticate/refresh')
+        .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${firstRes.body.token.accessToken}`)
         .send({
           email: firstRes.body.data.email,
           refreshToken: firstRes.body.token.refreshToken,
         });
       const secondRefreshTokenRes = await server
-        .post('/authenticate/refresh')
+        .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${secondRes.body.token.accessToken}`)
         .send({
           email: secondRes.body.data.email,
@@ -182,16 +185,16 @@ describe('Auth module', () => {
     });
   });
 
-  describe('/register', () => {
+  describe(ROUTE_REGISTER, () => {
     it('Should throw error when register exists user', async () => {
-      const res = await server.post('/register').send(userRequest);
+      const res = await server.post(ROUTE_REGISTER).send(userRequest);
 
       expect(res.status).to.equal(httpStatus.FORBIDDEN);
       expect(res.error.message).to.be.an('string');
     });
 
     it('Should register new user', async () => {
-      const res = await server.post('/register').send({
+      const res = await server.post(ROUTE_REGISTER).send({
         email: 'newEmail123@gmail.com',
         password: '123456',
         name: 'name',

@@ -96,7 +96,7 @@ export class MessageController {
       if (message) {
         await message.remove();
       }
-      ctx.status = httpStatus.OK;
+      ctx.status = httpStatus.NO_CONTENT;
     } catch (err) {
       ctx.throw(err.status, err.message);
     }

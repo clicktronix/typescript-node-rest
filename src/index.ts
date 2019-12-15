@@ -33,7 +33,3 @@ export const app = new App().app.listen(
   CONFIG.port,
   () => console.info(`Server is listening on port ${CONFIG.port}`),
 );
-// export default new App().app.listen(
-//   CONFIG.port,
-//   () => console.info(`Server is listening on port ${CONFIG.port}`),
-// );

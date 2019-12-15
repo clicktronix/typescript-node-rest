@@ -4,6 +4,8 @@ import * as httpStatus from 'http-status';
 import * as R from 'ramda';
 import supertest from 'supertest';
 
+import { ROUTE_AUTH, ROUTE_USERS, ROUTE_REGISTER } from 'routes/constants';
+
 import { app } from '../src';
 import { registerUser } from './helpers/auth';
 
@@ -22,16 +24,16 @@ describe('User module', () => {
     try {
       server = supertest(app);
       await registerUser(server, userRequest);
-      userResponseData = await server.post('/authenticate').send(userRequest);
+      userResponseData = await server.post(ROUTE_AUTH).send(userRequest);
     } catch (err) {
       console.error(err);
     }
   });
 
-  describe('/users', () => {
+  describe(ROUTE_USERS, () => {
     it('Should get users', async () => {
       const res = await server
-        .get('/users')
+        .get(ROUTE_USERS)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
@@ -40,7 +42,7 @@ describe('User module', () => {
 
     it('Should return user by id', async () => {
       const res = await server
-        .get(`/users/${userResponseData.body.data._id}`)
+        .get(`${ROUTE_USERS}/${userResponseData.body.data._id}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
@@ -49,7 +51,7 @@ describe('User module', () => {
 
     it('Should return error if user does not exist', async () => {
       const res = await server
-        .get(`/users/${INVALID_ID}`)
+        .get(`${ROUTE_USERS}/${INVALID_ID}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
@@ -58,7 +60,7 @@ describe('User module', () => {
 
     it('Should return error on get user if access token is invalid', async () => {
       const res = await server
-        .get(`/users/${userResponseData.body.data._id}`)
+        .get(`${ROUTE_USERS}/${userResponseData.body.data._id}`)
         .set('Authorization', INVALID_ID);
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
@@ -67,7 +69,7 @@ describe('User module', () => {
 
     it('Should update user by id', async () => {
       const res = await server
-        .put('/users').send(userResponseData.body.data)
+        .put(ROUTE_USERS).send(userResponseData.body.data)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
@@ -76,7 +78,7 @@ describe('User module', () => {
 
     it('Should return error if user does not exist, when it updating', async () => {
       const res = await server
-        .put('/users')
+        .put(ROUTE_USERS)
         .send({
           ...userResponseData.body.data,
           email: '123@mail.ru',
@@ -89,7 +91,7 @@ describe('User module', () => {
 
     it('Should return error on put user if access token is invalid', async () => {
       const res = await server
-        .put('/users')
+        .put(ROUTE_USERS)
         .send({
           ...userResponseData.body.data,
           email: '123@mail.ru',
@@ -107,21 +109,23 @@ describe('User module', () => {
         email: 'emailForDelete@gmail.com',
         password: '123456',
       };
-      await server.post('/register').send(newUser).set('Authorization', userResponseData.body.token.accessToken);
+      await server
+        .post(ROUTE_REGISTER)
+        .send(newUser).set('Authorization', userResponseData.body.token.accessToken);
 
       const registeredUser = await server
-        .post('/authenticate')
+        .post(ROUTE_AUTH)
         .send(newUser)
         .set('Authorization', userResponseData.body.token.accessToken);
       const res = await server
-        .delete(`/users/${registeredUser.body.data._id}`)
+        .delete(`${ROUTE_USERS}/${registeredUser.body.data._id}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NO_CONTENT);
     });
 
     it('Should throw error if the userId being deleted does not exist', async () => {
-      const res = await server.delete('/users').set('Authorization', userResponseData.body.token.accessToken);
+      const res = await server.delete(ROUTE_USERS).set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.METHOD_NOT_ALLOWED);
       expect(res.error.message).to.be.an('string');
@@ -129,7 +133,7 @@ describe('User module', () => {
 
     it('Should return error on delete user if access token is invalid', async () => {
       const res = await server
-        .delete(`/users/${userResponseData.body.data._id}`)
+        .delete(`${ROUTE_USERS}/${userResponseData.body.data._id}`)
         .set('Authorization', INVALID_ID);
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
