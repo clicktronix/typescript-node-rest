@@ -12,7 +12,7 @@ const userRequest = {
   password: '123456',
 };
 
-const INVALID_USER_ID = '5c535bec1234352055129874';
+const INVALID_ID = '5c535bec1234352055129874';
 
 describe('User module', () => {
   let server: any;
@@ -49,10 +49,19 @@ describe('User module', () => {
 
     it('Should return error if user does not exist', async () => {
       const res = await server
-        .get(`/users/${INVALID_USER_ID}`)
+        .get(`/users/${INVALID_ID}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
+      expect(res.error.message).to.be.an('string');
+    });
+
+    it('Should return error on get user if access token is invalid', async () => {
+      const res = await server
+        .get(`/users/${userResponseData.body.data._id}`)
+        .set('Authorization', INVALID_ID);
+
+      expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
       expect(res.error.message).to.be.an('string');
     });
 
@@ -75,6 +84,19 @@ describe('User module', () => {
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
+      expect(res.error.message).to.be.an('string');
+    });
+
+    it('Should return error on put user if access token is invalid', async () => {
+      const res = await server
+        .put('/users')
+        .send({
+          ...userResponseData.body.data,
+          email: '123@mail.ru',
+        })
+        .set('Authorization', INVALID_ID);
+
+      expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
       expect(res.error.message).to.be.an('string');
     });
 
@@ -102,6 +124,15 @@ describe('User module', () => {
       const res = await server.delete('/users').set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.METHOD_NOT_ALLOWED);
+      expect(res.error.message).to.be.an('string');
+    });
+
+    it('Should return error on delete user if access token is invalid', async () => {
+      const res = await server
+        .delete(`/users/${userResponseData.body.data._id}`)
+        .set('Authorization', INVALID_ID);
+
+      expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
       expect(res.error.message).to.be.an('string');
     });
   });
