@@ -1,9 +1,9 @@
 import { expect } from 'chai';
-import { default as ioClient } from 'socket.io-client';
-import { default as ioServer } from 'socket.io';
+import ioClient from 'socket.io-client';
+import ioServer from 'socket.io';
 
 import { Socket } from 'sockets';
-import { IMessage } from 'models';
+import { Message } from 'models';
 import { CONFIG } from 'config';
 import { SOCKET_MESSAGE, SOCKET_ERROR, SOCKET_CONNECT } from 'sockets/constants';
 
@@ -42,7 +42,7 @@ describe('Socket module', () => {
 
   it('Should send message for client', (done) => {
     client.on(SOCKET_CONNECT, () => {
-      client.on(SOCKET_MESSAGE, (req: IMessage) => {
+      client.on(SOCKET_MESSAGE, (req: Message) => {
         expect(req).to.deep.equal({
           content: 'message',
           sender: 'userEmail@gmail.com',

@@ -9,13 +9,11 @@ export class MessageController {
   /**
    * GET /messages
    */
-  public async getMessages(ctx: Context) {
+  public static async getMessages(ctx: Context) {
     try {
       const messages = await Message.find({});
       ctx.status = httpStatus.OK;
-      ctx.body = {
-        data: messages || [],
-      };
+      ctx.body = { data: messages || [] };
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
@@ -25,17 +23,15 @@ export class MessageController {
    * GET /messages/:messageId
    */
   @bind
-  public async getMessage(ctx: Context) {
+  public static async getMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {
       const usersMeta = decodeToken(headers.authorization);
-      const message = await this.findMessage(ctx, usersMeta);
+      const message = await MessageController.findMessage(ctx, usersMeta);
       if (!message) {
         return ctx.throw(httpStatus.NOT_FOUND, 'Message not found');
       }
-      ctx.body = {
-        data: message,
-      };
+      ctx.body = { data: message };
       ctx.status = httpStatus.OK;
     } catch (err) {
       ctx.throw(err.status, err.message);
@@ -46,7 +42,7 @@ export class MessageController {
    * POST /messages
    */
   @bind
-  public async postMessage(ctx: Context) {
+  public static async postMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
       const usersMeta = decodeToken(headers.authorization);
@@ -73,11 +69,11 @@ export class MessageController {
    * PATCH /messages/:messageId
    */
   @bind
-  public async updateMessage(ctx: Context) {
+  public static async updateMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
       const usersMeta = decodeToken(headers.authorization);
-      const message = await this.findMessage(ctx, usersMeta);
+      const message = await MessageController.findMessage(ctx, usersMeta);
       if (message) {
         message.content = body.content;
         await message.save();
@@ -92,19 +88,21 @@ export class MessageController {
    * DELETE /messages/:messageId
    */
   @bind
-  public async deleteMessage(ctx: Context) {
+  public static async deleteMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {
       const usersMeta = decodeToken(headers.authorization);
-      const message = await this.findMessage(ctx, usersMeta);
-      message && await message.remove();
+      const message = await MessageController.findMessage(ctx, usersMeta);
+      if (message) {
+        await message.remove();
+      }
       ctx.status = httpStatus.OK;
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
   }
 
-  private async findMessage(ctx: Context, usersMeta: IUserModel) {
+  private static async findMessage(ctx: Context, usersMeta: IUserModel) {
     try {
       const message = await Message.findById(ctx.request.ctx.params.messageId);
       const user = await User.findById(usersMeta.id);

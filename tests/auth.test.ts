@@ -3,8 +3,9 @@ import supertest from 'supertest';
 import * as httpStatus from 'http-status';
 
 import { CONFIG } from 'config';
+
 import { registerUser } from './helpers/auth';
-import app from '../src';
+import { app } from '../src';
 
 const userRequest = {
   email: 'authEmail@gmail.com',
@@ -54,18 +55,14 @@ describe('Auth module', () => {
     });
 
     it('Should return 404, if email is empty', async () => {
-      const res = await server.post('/authenticate').send({
-        password: '12345',
-      });
+      const res = await server.post('/authenticate').send({ password: '12345' });
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
       expect(res.error.message).to.be.an('string');
     });
 
     it('Should return 404, if password is empty', async () => {
-      const res = await server.post('/authenticate').send({
-        email: 'mail',
-      });
+      const res = await server.post('/authenticate').send({ email: 'mail' });
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
       expect(res.error.message).to.be.an('string');

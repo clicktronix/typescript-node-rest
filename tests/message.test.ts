@@ -4,7 +4,7 @@ import * as httpStatus from 'http-status';
 import supertest from 'supertest';
 
 import { registerUser } from './helpers/auth';
-import app from '../src';
+import { app } from '../src';
 
 const userRequest = {
   email: 'userEmail@gmail.com',
@@ -152,7 +152,7 @@ describe('Message module', () => {
     });
 
     it('Should throw error if the message id being deleted does not exist', async () => {
-      const res = await server.delete(`/messages`)
+      const res = await server.delete('/messages')
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.METHOD_NOT_ALLOWED);

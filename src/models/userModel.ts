@@ -4,7 +4,8 @@ import * as jwt from 'jsonwebtoken';
 import * as R from 'ramda';
 
 import { CONFIG } from 'config';
-import { IMessageModel } from './messageModel';
+
+import { MessageModel } from './messageModel';
 
 export interface IUser {
   email: string;
@@ -12,7 +13,7 @@ export interface IUser {
   surname: string;
   password: string;
   tokens: string[];
-  messages: IMessageModel[];
+  messages: MessageModel[];
 }
 
 export interface IUserModel extends IUser, mongoose.Document {
@@ -21,57 +22,63 @@ export interface IUserModel extends IUser, mongoose.Document {
   getRefreshToken(): string | undefined;
 }
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 const SALT_ROUND = 10;
 
-export const UserSchema = new Schema<IUserModel>({
-  id: Schema.Types.ObjectId,
-  name: {
-    type: String,
-    required: [true, 'Name is required'],
-    trim: true,
+export const UserSchema = new Schema<IUserModel>(
+  {
+    id: Schema.Types.ObjectId,
+    name: {
+      type: String,
+      required: [true, 'Name is required'],
+      trim: true,
+    },
+    surname: {
+      type: String,
+      required: [true, 'Surname is required'],
+      trim: true,
+    },
+    email: {
+      type: String,
+      unique: true,
+      match: [/^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,4})$/, 'Email is not valid'],
+      required: [true, 'Email is required'],
+      trim: true,
+      maxlength: [50, 'You have exceeded the maximum email length'],
+      minlength: [5, 'Email is too short'],
+    },
+    password: {
+      type: String,
+      required: [true, 'Enter password'],
+      trim: true,
+      minlength: [5, 'Password is too short'],
+      select: false,
+    },
+    tokens: {
+      type: [String],
+      select: false,
+    },
+    messages: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Message',
+      },
+    ],
   },
-  surname: {
-    type: String,
-    required: [true, 'Surname is required'],
-    trim: true,
+  {
+    timestamps: true,
+    useNestedStrict: true,
+    versionKey: false,
   },
-  email: {
-    type: String,
-    unique: true,
-    match: [/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/, 'Email is not valid'],
-    required: [true, 'Email is required'],
-    trim: true,
-    maxlength: [50, 'You have exceeded the maximum email length'],
-    minlength: [5, 'Email is too short'],
-  },
-  password: {
-    type: String,
-    required: [true, 'Enter password'],
-    trim: true,
-    minlength: [5, 'Password is too short'],
-    select: false,
-  },
-  tokens: {
-    type: [String],
-    select: false,
-  },
-  messages: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Message',
-  }],
-}, {
-  timestamps: true,
-  useNestedStrict: true,
-  versionKey: false,
-},
 );
 
 /**
  * Password hash middleware
  */
-UserSchema.pre('save', async function () {
-  if (!(this as IUserModel).isModified('password')) { return; }
+UserSchema.pre('save', async function hashMiddleware() {
+  if (!(this as IUserModel).isModified('password')) {
+    return;
+  }
   try {
     const salt = await bcrypt.genSalt(SALT_ROUND);
     const hash = await bcrypt.hash((this as IUserModel).password, salt);
@@ -84,29 +91,29 @@ UserSchema.pre('save', async function () {
 /**
  * Helper method for validating user's password
  */
-UserSchema.methods.comparePassword = function (pwd: string) {
+UserSchema.methods.comparePassword = function comparePassword(pwd: string) {
   return bcrypt.compareSync(pwd, (this as IUserModel).password);
 };
 
 /**
  * Get full name method
  */
-UserSchema.virtual('fullName').get(function () {
-  return (this as IUserModel).name + ' ' + (this as IUserModel).surname;
+UserSchema.virtual('fullName').get(function fullName() {
+  return `${(this as IUserModel).name} ${(this as IUserModel).surname}`;
 });
 
 /**
  * Helper method for getting jwt token
  */
-UserSchema.methods.getJWT = function () {
+UserSchema.methods.getJWT = function getJWT() {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
-  return 'Bearer ' + jwt.sign({ id: (this as IUserModel)._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime });
+  return `Bearer ${jwt.sign({ id: (this as IUserModel)._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime })}`;
 };
 
 /**
  * Helper method for getting jwt token
  */
-UserSchema.methods.getRefreshToken = function () {
+UserSchema.methods.getRefreshToken = function getRefreshToken() {
   return R.last(this.tokens);
 };
 

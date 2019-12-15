@@ -1,16 +1,17 @@
 import * as mongoose from 'mongoose';
-import { IUserModel } from './userModel';
-import { IChatModel } from './chatModel';
 
-export interface IMessage {
+import { IUserModel } from './userModel';
+import { ChatModel } from './chatModel';
+
+export interface Message {
   content: string;
   sender: IUserModel;
-  owner: IUserModel | IChatModel;
+  owner: IUserModel | ChatModel;
 }
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
-const MessageSchema = new Schema<IMessageModel>({
+const MessageSchema = new Schema<MessageModel>({
   id: Schema.Types.ObjectId,
   content: {
     type: String,
@@ -31,5 +32,5 @@ const MessageSchema = new Schema<IMessageModel>({
   },
 });
 
-export interface IMessageModel extends IMessage, mongoose.Document { }
-export const Message = mongoose.model<IMessageModel>('Message', MessageSchema);
+export interface MessageModel extends Message, mongoose.Document { }
+export const Message = mongoose.model<MessageModel>('Message', MessageSchema);

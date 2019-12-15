@@ -16,11 +16,7 @@
     "traceResolution": true,
     "strictNullChecks": true,
     "lib": [
-      "es2015",
-      "es2017",
-      "es6",
-      "es7",
-      "es5",
+      "es2020",
       "scripthost"
     ],
     "experimentalDecorators": true,

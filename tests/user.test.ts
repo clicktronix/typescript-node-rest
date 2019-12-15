@@ -4,7 +4,7 @@ import * as httpStatus from 'http-status';
 import * as R from 'ramda';
 import supertest from 'supertest';
 
-import app from '../src';
+import { app } from '../src';
 import { registerUser } from './helpers/auth';
 
 const userRequest = {
@@ -99,7 +99,7 @@ describe('User module', () => {
     });
 
     it('Should throw error if the userId being deleted does not exist', async () => {
-      const res = await server.delete(`/users`).set('Authorization', userResponseData.body.token.accessToken);
+      const res = await server.delete('/users').set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.METHOD_NOT_ALLOWED);
       expect(res.error.message).to.be.an('string');

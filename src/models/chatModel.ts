@@ -1,21 +1,27 @@
 import * as mongoose from 'mongoose';
-import { IMessageModel } from './messageModel';
 
-export interface IChat {
-  messages: IMessageModel[];
+import { MessageModel } from './messageModel';
+
+export interface Chat {
+  messages: MessageModel[];
   type?: 'main-chat' | 'private-chat';
 }
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
-const ChatSchema = new Schema<IChatModel>({
+const ChatSchema = new Schema<ChatModel>({
   id: Schema.Types.ObjectId,
-  type: { type: String, default: 'private-chat' },
-  messages: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Message',
-  }],
+  type: {
+    type: String,
+    default: 'private-chat',
+  },
+  messages: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Message',
+    },
+  ],
 });
 
-export interface IChatModel extends IChat, mongoose.Document { }
-export const Chat = mongoose.model<IChatModel>('Chat', ChatSchema);
+export interface ChatModel extends Chat, mongoose.Document { }
+export const Chat = mongoose.model<ChatModel>('Chat', ChatSchema);
