@@ -137,9 +137,14 @@ describe('Message module', () => {
     it('Should delete message', async () => {
       const newMessage = {
         content: 'new message',
-        to: 'userEmail@gmail.com',
+        owner: 'userEmail@gmail.com',
+        sender: 'userEmail@gmail.com',
+        onModel: 'User',
       };
-      await server.post('/register').send(newMessage).set('Authorization', userResponseData.body.token.accessToken);
+      await server
+        .post('/messages')
+        .send(newMessage)
+        .set('Authorization', userResponseData.body.token.accessToken);
 
       const messages = await server
         .get('/messages')
@@ -152,7 +157,8 @@ describe('Message module', () => {
     });
 
     it('Should throw error if the message id being deleted does not exist', async () => {
-      const res = await server.delete('/messages')
+      const res = await server
+        .delete('/messages')
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.METHOD_NOT_ALLOWED);
