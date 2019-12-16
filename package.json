@@ -7,8 +7,9 @@
     "build": "tsc",
     "dev": "better-npm-run dev",
     "test": "better-npm-run test",
-    "check-types": "node_modules/.bin/tsc -p . --noEmit -w",
-    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts}' --quiet --fix"
+    "check-types": "tsc -p . --noEmit -w",
+    "lint": "eslint . --ext .js,.ts && tsc --noEmit --pretty",
+    "lint:autofix": "eslint . --ext .ts --fix"
   },
   "betterScripts": {
     "dev": {
