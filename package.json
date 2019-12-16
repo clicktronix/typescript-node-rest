@@ -20,7 +20,7 @@
       }
     },
     "test": {
-      "command": "nodemon -e ts -w **/*.test.ts -x node_modules/.bin/mocha --require ts-node/register **/*.test.ts",
+      "command": "mocha -r ts-node/register **/*.test.ts --exit",
       "env": {
         "NODE_PATH": "src/",
         "NODE_ENV": "test"
