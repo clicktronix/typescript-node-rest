@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "module": "esnext",
+    "module": "commonjs",
     "esModuleInterop": true,
-    "target": "esnext",
+    "target": "ES2017",
     "baseUrl": "./src",
     "noImplicitAny": true,
     "moduleResolution": "node",
@@ -17,7 +17,7 @@
     "traceResolution": true,
     "strictNullChecks": true,
     "lib": [
-      "esnext",
+      "es6",
       "scripthost"
     ],
     "experimentalDecorators": true,

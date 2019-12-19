@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { EventEmitter } from 'events';
 
-import { CONFIG } from 'config';
+import { CONFIG } from '../config';
 
 export class DataBase {
   private emitter = new EventEmitter();
