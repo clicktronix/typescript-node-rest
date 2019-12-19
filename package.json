@@ -4,17 +4,19 @@
   "description": "Rest Node.js starter kit",
   "main": "dist/index",
   "typings": "dist/index",
+  "engines": {
+    "node": "12.13.x"
+  },
   "scripts": {
     "build": "tsc",
+    "start": "node dist/index.js",
     "clean:dist": "rm -rf dist",
     "dev": "better-npm-run dev",
     "test": "better-npm-run test",
     "check-types": "tsc -p . --noEmit -w",
     "lint": "eslint . --ext .js,.ts && tsc --noEmit --pretty",
     "lint:autofix": "eslint . --ext .ts --fix",
-    "prod:serve": "node dist/index.js",
-    "heroku:start": "better-npm-run heroku:start:dev",
-    "heroku:build": "npm run clean:dist && npm run build && npm run prod:serve"
+    "heroku:start": "better-npm-run heroku:start:dev"
   },
   "betterScripts": {
     "heroku:start:dev": {
