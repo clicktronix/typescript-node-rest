@@ -16,7 +16,7 @@
     "traceResolution": true,
     "strictNullChecks": true,
     "lib": [
-      "es2020",
+      "esnext",
       "scripthost"
     ],
     "experimentalDecorators": true,
