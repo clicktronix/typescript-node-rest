@@ -29,7 +29,9 @@
   },
   "include": [
     "src/**/*",
-    "tests/**/*",
     "@types/**/*"
+  ],
+  "exclude": [
+    "tests/**/*",
   ]
 }
