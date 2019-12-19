@@ -5,13 +5,14 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "clean:dist": "rm -rf dist",
     "dev": "better-npm-run dev",
     "test": "better-npm-run test",
     "check-types": "tsc -p . --noEmit -w",
     "lint": "eslint . --ext .js,.ts && tsc --noEmit --pretty",
     "lint:autofix": "eslint . --ext .ts --fix",
     "prod:serve": "node dist/index.js",
-    "heroku:build": "npm run build && npm run prod:serve"
+    "heroku:build": "npm run clean:dist && npm run build && npm run prod:serve"
   },
   "betterScripts": {
     "dev": {
