@@ -2,7 +2,8 @@
   "name": "roulette-rest",
   "version": "1.0.0",
   "description": "Rest Node.js starter kit",
-  "main": "dist/src/index.js",
+  "main": "dist/index",
+  "typings": "dist/index",
   "scripts": {
     "build": "tsc",
     "dev": "better-npm-run dev",
