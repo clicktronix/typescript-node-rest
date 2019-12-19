@@ -13,9 +13,17 @@
     "lint": "eslint . --ext .js,.ts && tsc --noEmit --pretty",
     "lint:autofix": "eslint . --ext .ts --fix",
     "prod:serve": "node dist/index.js",
+    "heroku:start": "better-npm-run heroku:start:dev",
     "heroku:build": "npm run clean:dist && npm run build && npm run prod:serve"
   },
   "betterScripts": {
+    "heroku:start:dev": {
+      "command": "ts-node ./src/index.ts",
+      "env": {
+        "NODE_PATH": "src/",
+        "NODE_ENV": "dev"
+      }
+    },
     "dev": {
       "command": "nodemon -e ts -w ./src -x ts-node ./src/index.ts",
       "env": {
