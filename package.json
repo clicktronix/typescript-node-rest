@@ -2,7 +2,7 @@
   "name": "roulette-rest",
   "version": "1.0.0",
   "description": "Rest Node.js starter kit",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "dev": "better-npm-run dev",
@@ -10,7 +10,7 @@
     "check-types": "tsc -p . --noEmit -w",
     "lint": "eslint . --ext .js,.ts && tsc --noEmit --pretty",
     "lint:autofix": "eslint . --ext .ts --fix",
-    "prod:serve": "node dist/src/index.js",
+    "prod:serve": "node dist/index.js",
     "heroku:build": "npm run build && npm run prod:serve"
   },
   "betterScripts": {

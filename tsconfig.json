@@ -29,7 +29,10 @@
   },
   "include": [
     "src/**/*",
-    "tests/**/*",
     "@types/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "tests/**/*",
   ]
 }
