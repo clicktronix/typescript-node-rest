@@ -15,17 +15,9 @@
     "test": "better-npm-run test",
     "check-types": "tsc -p . --noEmit -w",
     "lint": "eslint . --ext .js,.ts && tsc --noEmit --pretty",
-    "lint:autofix": "eslint . --ext .ts --fix",
-    "heroku:start": "better-npm-run heroku:start:dev"
+    "lint:autofix": "eslint . --ext .ts --fix"
   },
   "betterScripts": {
-    "heroku:start:dev": {
-      "command": "ts-node ./src/index.ts",
-      "env": {
-        "NODE_PATH": "src/",
-        "NODE_ENV": "dev"
-      }
-    },
     "dev": {
       "command": "nodemon -e ts -w ./src -x ts-node ./src/index.ts",
       "env": {
