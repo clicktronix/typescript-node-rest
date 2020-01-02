@@ -7,9 +7,9 @@ import { CONFIG } from '../config';
 export class DataBase {
   private emitter = new EventEmitter();
   private mongodTest: MongoMemoryServer | null = null;
-  private mongoUrl = `
-    mongodb://${CONFIG.db_user}:${CONFIG.db_password}@${CONFIG.db_host}:${CONFIG.db_port}/${CONFIG.db_name}
-  `;
+  private mongoUrl = CONFIG.heroku_mongo_uri
+    ? CONFIG.heroku_mongo_uri
+    : `mongodb://${CONFIG.db_user}:${CONFIG.db_password}@${CONFIG.db_host}:${CONFIG.db_port}/${CONFIG.db_name}`;
 
   private mongoOptions = {
     useNewUrlParser: true,
