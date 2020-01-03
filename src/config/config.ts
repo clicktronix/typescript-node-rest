@@ -18,5 +18,5 @@ export const CONFIG = {
   db_password: process.env.DB_PASSWORD || 'password',
   jwt_encryption: process.env.NODE_ENV === 'test' ? 'TEST_KEY' : process.env.JWT_ENCRYPTION || 'SECRET_KEY',
   jwt_expiration: process.env.JWT_EXPIRATION || '600000',
-  heroku_mongo_uri: process.env.HEROKU_MONGODB_URI || '',
+  heroku_mongo_uri: process.env.MONGODB_URI || '',
 };
