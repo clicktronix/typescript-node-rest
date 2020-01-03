@@ -13,7 +13,7 @@ import {
 const router = new Router();
 
 // Public routes
-router.post(ROUTE_ROOT, GeneralController.helloWorld);
+router.get(ROUTE_ROOT, GeneralController.helloWorld);
 router.post(ROUTE_REGISTER, AuthController.registerNewUser);
 router.post(ROUTE_AUTH, AuthController.authenticate);
 
