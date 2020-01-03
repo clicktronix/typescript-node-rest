@@ -1,3 +1,4 @@
+export const ROUTE_ROOT = '/';
 export const ROUTE_REGISTER = '/register';
 export const ROUTE_AUTH = '/authenticate';
 export const ROUTE_REFRESH_TOKEN = '/authenticate/refresh';
