@@ -4,5 +4,6 @@
   "description": "A Node.js app using koa, typescript and mongo",
   "repository": "https://github.com/clicktronix/typescript-node-rest",
   "keywords": ["node", "koa", "heroku", "mongo", "typescript"],
-  "image": "heroku/nodejs"
+  "image": "heroku/nodejs",
+  "addons": ["mongolab"]
 }

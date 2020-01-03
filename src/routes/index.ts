@@ -1,9 +1,8 @@
 import Router from 'koa-router';
 import jwtMiddleware from 'koa-jwt';
 
-import { UserController, AuthController, MessageController } from 'controllers';
-import { CONFIG } from 'config';
-
+import { UserController, AuthController, MessageController } from '../controllers';
+import { CONFIG } from '../config';
 import {
   ROUTE_REGISTER, ROUTE_AUTH, ROUTE_REFRESH_TOKEN, ROUTE_LOGOUT, ROUTE_USERS, ROUTE_USERS_ID,
   ROUTE_MESSAGES, ROUTE_MESSAGES_ID,

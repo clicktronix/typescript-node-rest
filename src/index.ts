@@ -2,8 +2,7 @@ import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import socketIo from 'socket.io';
 
-import { Socket } from 'sockets';
-
+import { Socket } from './sockets';
 import { router } from './routes';
 import { DataBase } from './data';
 import { CONFIG } from './config';

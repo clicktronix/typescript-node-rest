@@ -3,8 +3,7 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import * as R from 'ramda';
 
-import { CONFIG } from 'config';
-
+import { CONFIG } from '../config';
 import { MessageModel } from './messageModel';
 
 export interface IUser {

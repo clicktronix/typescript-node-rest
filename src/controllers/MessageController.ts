@@ -2,8 +2,8 @@ import { Context } from 'koa';
 import * as httpStatus from 'http-status';
 import { bind } from 'decko';
 
-import { Message, User, IUserModel } from 'models';
-import { decodeToken } from 'shared/helpers/decodeToken';
+import { Message, User, IUserModel } from '../models';
+import { decodeToken } from '../shared/helpers/decodeToken';
 
 export class MessageController {
   /**
