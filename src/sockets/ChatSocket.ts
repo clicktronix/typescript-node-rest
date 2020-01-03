@@ -1,8 +1,7 @@
 import { bind } from 'decko';
 import socketIo from 'socket.io';
 
-import { Chat, Message } from 'models';
-
+import { Chat, Message } from '../models';
 import { SOCKET_MESSAGE, SOCKET_ERROR } from './constants';
 
 export class ChatSocket {

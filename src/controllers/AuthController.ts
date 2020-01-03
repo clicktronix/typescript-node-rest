@@ -3,8 +3,8 @@ import * as httpStatus from 'http-status';
 import * as R from 'ramda';
 import { bind } from 'decko';
 
-import { User } from 'models/userModel';
-import * as refreshTokenService from 'shared/helpers/refreshToken';
+import { User } from '../models/userModel';
+import * as refreshTokenService from '../shared/helpers/refreshToken';
 
 export class AuthController {
   /**

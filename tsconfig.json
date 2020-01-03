@@ -2,12 +2,13 @@
   "compilerOptions": {
     "module": "commonjs",
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "ES2017",
     "baseUrl": "./src",
     "noImplicitAny": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "outDir": "dist",
+    "rootDir": "src",
     "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "./node_modules/@types",
@@ -16,7 +17,7 @@
     "traceResolution": true,
     "strictNullChecks": true,
     "lib": [
-      "esnext",
+      "es6",
       "scripthost"
     ],
     "experimentalDecorators": true,
@@ -29,10 +30,8 @@
   },
   "include": [
     "src/**/*",
-    "@types/**/*"
   ],
   "exclude": [
-    "node_modules",
     "tests/**/*",
   ]
 }

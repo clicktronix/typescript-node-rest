@@ -1,1 +1,1 @@
-web: npm run heroku:build
+web: ts-node src/index.ts
