@@ -10,6 +10,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "start": "ts-node src/index.ts",
     "clean:dist": "rm -rf dist",
     "dev": "better-npm-run dev",
     "test": "better-npm-run test",
