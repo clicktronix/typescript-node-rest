@@ -1,14 +1,19 @@
 import { Context } from 'koa';
 import * as httpStatus from 'http-status';
-import { bind } from 'decko';
+import {
+  request, summary, tagsAll,
+} from 'koa-swagger-decorator';
+
+import { ROUTE_MESSAGES, ROUTE_MESSAGES_ID } from 'routes/constants';
 
 import { Message, User, IUserModel } from '../models';
 import { decodeToken } from '../shared/helpers/decodeToken';
 
+@tagsAll(['Message'])
 export class MessageController {
-  /**
-   * GET /messages
-   */
+  @request('get', ROUTE_MESSAGES)
+  @summary('Get message list')
+  // @swaggerBody([Message])
   public static async getMessages(ctx: Context) {
     try {
       const messages = await Message.find({});
@@ -19,10 +24,9 @@ export class MessageController {
     }
   }
 
-  /**
-   * GET /messages/:messageId
-   */
-  @bind
+  @request('get', ROUTE_MESSAGES_ID)
+  @summary('Get message by id')
+  // @swaggerBody(User)
   public static async getMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {
@@ -38,10 +42,9 @@ export class MessageController {
     }
   }
 
-  /**
-   * POST /messages
-   */
-  @bind
+  @request('post', ROUTE_MESSAGES)
+  @summary('Set message')
+  // @query(Message)
   public static async postMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
@@ -65,10 +68,9 @@ export class MessageController {
     }
   }
 
-  /**
-   * PATCH /messages/:messageId
-   */
-  @bind
+  @request('patch', ROUTE_MESSAGES_ID)
+  @summary('Update message by id')
+  // @query({ content: { type: 'string', required: true } })
   public static async updateMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
@@ -84,10 +86,9 @@ export class MessageController {
     }
   }
 
-  /**
-   * DELETE /messages/:messageId
-   */
-  @bind
+  @request('delete', ROUTE_MESSAGES_ID)
+  @summary('Delete message by id')
+  // @query({ messageId: { type: 'string', required: true } })
   public static async deleteMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {

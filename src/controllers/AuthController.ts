@@ -1,11 +1,12 @@
 import { Context } from 'koa';
 import * as httpStatus from 'http-status';
 import * as R from 'ramda';
-import { bind } from 'decko';
+import { tagsAll } from 'koa-swagger-decorator';
 
 import { User } from '../models/userModel';
 import * as refreshTokenService from '../shared/helpers/refreshToken';
 
+@tagsAll(['Message'])
 export class AuthController {
   /**
    * POST /register
@@ -28,7 +29,6 @@ export class AuthController {
    * POST /authenticate
    * Sign in using email and password
    */
-  @bind
   public static async authenticate(ctx: Context) {
     const { body } = ctx.request;
     try {
@@ -54,7 +54,6 @@ export class AuthController {
   /**
    * POST /logout
    */
-  @bind
   public static async logout(ctx: Context) {
     const { body: { refreshToken } } = ctx.request;
     try {
@@ -72,7 +71,6 @@ export class AuthController {
   /**
    * POST /authenticate/refresh
    */
-  @bind
   public static async refreshAccessToken(ctx: Context) {
     const { body: { refreshToken } } = ctx.request;
     try {
