@@ -1,19 +1,29 @@
 import { Context } from 'koa';
 import * as httpStatus from 'http-status';
 import {
-  request, summary, tagsAll,
+  request, summary, tagsAll, query, body as requestBody, responsesAll,
 } from 'koa-swagger-decorator';
 
 import { ROUTE_MESSAGES, ROUTE_MESSAGES_ID } from 'routes/constants';
 
-import { Message, User, IUserModel } from '../models';
+import {
+  Message, User, IUserModel, messageSwaggerSchema,
+} from '../models';
 import { decodeToken } from '../shared/helpers/decodeToken';
 
 @tagsAll(['Message'])
+@responsesAll({
+  200: { description: 'Success' },
+  201: { description: 'Created' },
+  204: { description: 'No content' },
+  400: { description: 'Bad request' },
+  401: { description: 'You have not permissions' },
+  403: { description: 'Email is used' },
+  404: { description: 'Message not found' },
+})
 export class MessageController {
   @request('get', ROUTE_MESSAGES)
   @summary('Get message list')
-  // @swaggerBody([Message])
   public static async getMessages(ctx: Context) {
     try {
       const messages = await Message.find({});
@@ -26,7 +36,7 @@ export class MessageController {
 
   @request('get', ROUTE_MESSAGES_ID)
   @summary('Get message by id')
-  // @swaggerBody(User)
+  @requestBody(messageSwaggerSchema)
   public static async getMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {
@@ -44,7 +54,7 @@ export class MessageController {
 
   @request('post', ROUTE_MESSAGES)
   @summary('Set message')
-  // @query(Message)
+  @requestBody(messageSwaggerSchema)
   public static async postMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
@@ -70,7 +80,7 @@ export class MessageController {
 
   @request('patch', ROUTE_MESSAGES_ID)
   @summary('Update message by id')
-  // @query({ content: { type: 'string', required: true } })
+  @query(messageSwaggerSchema)
   public static async updateMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
@@ -88,7 +98,7 @@ export class MessageController {
 
   @request('delete', ROUTE_MESSAGES_ID)
   @summary('Delete message by id')
-  // @query({ messageId: { type: 'string', required: true } })
+  @query({ messageId: { type: 'string', required: true } })
   public static async deleteMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {

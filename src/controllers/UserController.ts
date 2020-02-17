@@ -1,16 +1,21 @@
 import { Context } from 'koa';
 import * as httpStatus from 'http-status';
 import {
-  request, summary, tagsAll,
+  request, summary, tagsAll, body as requestBody, path, responsesAll,
 } from 'koa-swagger-decorator';
 
-import { User } from '../models';
+import { User, userSwaggerSchema } from '../models';
 
 @tagsAll(['User'])
+@responsesAll({
+  200: { description: 'Success' },
+  204: { description: 'No content' },
+  400: { description: 'Bad request' },
+  404: { description: 'User not found' },
+})
 export class UserController {
   @request('get', '/users')
   @summary('Get user list')
-  // @body([User])
   public static async getUsers(ctx: Context) {
     try {
       const users = await User.find({});
@@ -23,7 +28,9 @@ export class UserController {
 
   @request('get', '/users/{userId}')
   @summary('Get user by id')
-  // @body(User)
+  @path({
+    userId: { type: 'number', required: true },
+  })
   public static async getUserById(ctx: Context) {
     try {
       const user = await User.findById(ctx.request.ctx.params.userId);
@@ -39,10 +46,14 @@ export class UserController {
 
   @request('put', '/users/{userId}')
   @summary('Update user by id')
-  // @query(User)
+  @path({
+    userId: { type: 'number', required: true },
+  })
+  @requestBody(userSwaggerSchema)
   public static async updateUser(ctx: Context) {
+    const { body } = ctx.request;
     try {
-      const user = await User.findOneAndUpdate({ email: ctx.request.body.email }, ctx.request.body, { new: true });
+      const user = await User.findOneAndUpdate({ email: body.email }, body, { new: true });
       if (!user) {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
@@ -58,7 +69,9 @@ export class UserController {
 
   @request('delete', '/users/{userId}')
   @summary('Delete user by id')
-  // @query({ userId: { type: 'string', required: true } })
+  @path({
+    userId: { type: 'number', required: true },
+  })
   public static async deleteUser(ctx: Context) {
     try {
       await User.deleteOne({ _id: ctx.request.ctx.params.userId });
