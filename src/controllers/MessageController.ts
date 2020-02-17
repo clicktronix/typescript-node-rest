@@ -1,7 +1,7 @@
 import { Context } from 'koa';
 import * as httpStatus from 'http-status';
 import {
-  request, summary, tagsAll, query, body as requestBody, responsesAll,
+  request, summary, tagsAll, body as requestBody, responsesAll, path,
 } from 'koa-swagger-decorator';
 
 import { ROUTE_MESSAGES, ROUTE_MESSAGES_ID } from 'routes/constants';
@@ -36,6 +36,7 @@ export class MessageController {
 
   @request('get', ROUTE_MESSAGES_ID)
   @summary('Get message by id')
+  @path({ messageId: { type: 'string', required: true } })
   @requestBody(messageSwaggerSchema)
   public static async getMessage(ctx: Context) {
     const { headers } = ctx.request;
@@ -80,7 +81,8 @@ export class MessageController {
 
   @request('patch', ROUTE_MESSAGES_ID)
   @summary('Update message by id')
-  @query(messageSwaggerSchema)
+  @path({ messageId: { type: 'string', required: true } })
+  @requestBody(messageSwaggerSchema)
   public static async updateMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
@@ -98,7 +100,7 @@ export class MessageController {
 
   @request('delete', ROUTE_MESSAGES_ID)
   @summary('Delete message by id')
-  @query({ messageId: { type: 'string', required: true } })
+  @path({ messageId: { type: 'string', required: true } })
   public static async deleteMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {

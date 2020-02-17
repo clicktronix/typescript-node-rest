@@ -4,6 +4,8 @@ import {
   request, summary, tagsAll, body as requestBody, path, responsesAll,
 } from 'koa-swagger-decorator';
 
+import { ROUTE_USERS, ROUTE_USERS_ID } from 'routes/constants';
+
 import { User, userSwaggerSchema } from '../models';
 
 @tagsAll(['User'])
@@ -14,7 +16,7 @@ import { User, userSwaggerSchema } from '../models';
   404: { description: 'User not found' },
 })
 export class UserController {
-  @request('get', '/users')
+  @request('get', ROUTE_USERS)
   @summary('Get user list')
   public static async getUsers(ctx: Context) {
     try {
@@ -26,11 +28,9 @@ export class UserController {
     }
   }
 
-  @request('get', '/users/{userId}')
+  @request('get', ROUTE_USERS_ID)
   @summary('Get user by id')
-  @path({
-    userId: { type: 'number', required: true },
-  })
+  @path({ userId: { type: 'number', required: true } })
   public static async getUserById(ctx: Context) {
     try {
       const user = await User.findById(ctx.request.ctx.params.userId);
@@ -44,11 +44,9 @@ export class UserController {
     }
   }
 
-  @request('put', '/users/{userId}')
+  @request('put', ROUTE_USERS_ID)
   @summary('Update user by id')
-  @path({
-    userId: { type: 'number', required: true },
-  })
+  @path({ userId: { type: 'number', required: true } })
   @requestBody(userSwaggerSchema)
   public static async updateUser(ctx: Context) {
     const { body } = ctx.request;
@@ -67,11 +65,9 @@ export class UserController {
     }
   }
 
-  @request('delete', '/users/{userId}')
+  @request('delete', ROUTE_USERS_ID)
   @summary('Delete user by id')
-  @path({
-    userId: { type: 'number', required: true },
-  })
+  @path({ userId: { type: 'number', required: true } })
   public static async deleteUser(ctx: Context) {
     try {
       await User.deleteOne({ _id: ctx.request.ctx.params.userId });
