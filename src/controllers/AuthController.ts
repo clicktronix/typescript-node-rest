@@ -1,20 +1,33 @@
 import { Context } from 'koa';
 import * as httpStatus from 'http-status';
 import * as R from 'ramda';
-import { bind } from 'decko';
+import {
+  tagsAll, request, summary, body as requestBody, responsesAll,
+} from 'koa-swagger-decorator';
 
-import { User } from '../models/userModel';
+import {
+  ROUTE_REGISTER, ROUTE_AUTH, ROUTE_LOGOUT, ROUTE_REFRESH_TOKEN,
+} from 'routes/constants';
+
+import { User, userSwaggerSchema } from '../models/userModel';
 import * as refreshTokenService from '../shared/helpers/refreshToken';
 
+@tagsAll(['Auth'])
+@responsesAll({
+  200: { description: 'Success' },
+  400: { description: 'Bad request' },
+  401: { description: 'Wrong password' },
+  403: { description: 'Email is used' },
+  404: { description: 'User not found' },
+})
 export class AuthController {
-  /**
-   * POST /register
-   */
+  @request('post', ROUTE_REGISTER)
+  @summary('Register new user')
+  @requestBody(userSwaggerSchema)
   public static async registerNewUser(ctx: Context) {
-    const { body } = ctx.request;
     try {
-      const newUser = new User(body);
-      if (await User.findOne({ email: body.email })) {
+      const newUser = new User(ctx.request.body);
+      if (await User.findOne({ email: ctx.request.body.email })) {
         return ctx.throw(httpStatus.FORBIDDEN, 'Email is used');
       }
       await newUser.save();
@@ -24,16 +37,16 @@ export class AuthController {
     }
   }
 
-  /**
-   * POST /authenticate
-   * Sign in using email and password
-   */
-  @bind
+  @request('post', ROUTE_AUTH)
+  @summary('Authenticate user')
+  @requestBody({
+    email: { type: 'string', example: 'email@gmail.com' },
+    password: { type: 'string', example: 'password' },
+  })
   public static async authenticate(ctx: Context) {
-    const { body } = ctx.request;
     try {
       const user = await AuthController.getUser(ctx, '+password +tokens');
-      if (!user.comparePassword(body.password)) {
+      if (!user.comparePassword(ctx.request.body.password)) {
         return ctx.throw(httpStatus.UNAUTHORIZED, 'Wrong password');
       }
       user.tokens = refreshTokenService.add(user.tokens);
@@ -51,10 +64,8 @@ export class AuthController {
     }
   }
 
-  /**
-   * POST /logout
-   */
-  @bind
+  @request('post', ROUTE_LOGOUT)
+  @summary('Logout endpoint')
   public static async logout(ctx: Context) {
     const { body: { refreshToken } } = ctx.request;
     try {
@@ -69,10 +80,9 @@ export class AuthController {
     }
   }
 
-  /**
-   * POST /authenticate/refresh
-   */
-  @bind
+  @request('post', ROUTE_REFRESH_TOKEN)
+  @summary('Refresh access token endpoint')
+  @requestBody({ refreshToken: { type: 'string', required: true } })
   public static async refreshAccessToken(ctx: Context) {
     const { body: { refreshToken } } = ctx.request;
     try {
