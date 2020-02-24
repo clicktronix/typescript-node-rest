@@ -1,8 +1,6 @@
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import socketIo from 'socket.io';
-import cors from '@koa/cors';
-import helmet from 'koa-helmet';
 
 import { Socket } from './sockets';
 import { router } from './routes';
@@ -24,12 +22,8 @@ class App {
   }
 
   private setMiddlewares() {
-    this.app
-      .use(helmet())
-      .use(cors())
-      .use(bodyParser())
-      .use(router.routes())
-      .use(router.allowedMethods());
+    this.app.use(bodyParser());
+    this.app.use(router.routes()).use(router.allowedMethods());
   }
 }
 

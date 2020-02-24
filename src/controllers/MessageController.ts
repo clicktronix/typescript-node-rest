@@ -1,29 +1,14 @@
 import { Context } from 'koa';
 import * as httpStatus from 'http-status';
-import {
-  request, summary, tagsAll, body as requestBody, responsesAll, path,
-} from 'koa-swagger-decorator';
+import { bind } from 'decko';
 
-import { ROUTE_MESSAGES, ROUTE_MESSAGES_ID } from 'routes/constants';
-
-import {
-  Message, User, IUserModel, messageSwaggerSchema,
-} from '../models';
+import { Message, User, IUserModel } from '../models';
 import { decodeToken } from '../shared/helpers/decodeToken';
 
-@tagsAll(['Message'])
-@responsesAll({
-  200: { description: 'Success' },
-  201: { description: 'Created' },
-  204: { description: 'No content' },
-  400: { description: 'Bad request' },
-  401: { description: 'You have not permissions' },
-  403: { description: 'Email is used' },
-  404: { description: 'Message not found' },
-})
 export class MessageController {
-  @request('get', ROUTE_MESSAGES)
-  @summary('Get message list')
+  /**
+   * GET /messages
+   */
   public static async getMessages(ctx: Context) {
     try {
       const messages = await Message.find({});
@@ -34,10 +19,10 @@ export class MessageController {
     }
   }
 
-  @request('get', ROUTE_MESSAGES_ID)
-  @summary('Get message by id')
-  @path({ messageId: { type: 'string', required: true } })
-  @requestBody(messageSwaggerSchema)
+  /**
+   * GET /messages/:messageId
+   */
+  @bind
   public static async getMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {
@@ -53,9 +38,10 @@ export class MessageController {
     }
   }
 
-  @request('post', ROUTE_MESSAGES)
-  @summary('Set message')
-  @requestBody(messageSwaggerSchema)
+  /**
+   * POST /messages
+   */
+  @bind
   public static async postMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
@@ -79,10 +65,10 @@ export class MessageController {
     }
   }
 
-  @request('patch', ROUTE_MESSAGES_ID)
-  @summary('Update message by id')
-  @path({ messageId: { type: 'string', required: true } })
-  @requestBody(messageSwaggerSchema)
+  /**
+   * PATCH /messages/:messageId
+   */
+  @bind
   public static async updateMessage(ctx: Context) {
     const { body, headers } = ctx.request;
     try {
@@ -98,9 +84,10 @@ export class MessageController {
     }
   }
 
-  @request('delete', ROUTE_MESSAGES_ID)
-  @summary('Delete message by id')
-  @path({ messageId: { type: 'string', required: true } })
+  /**
+   * DELETE /messages/:messageId
+   */
+  @bind
   public static async deleteMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {

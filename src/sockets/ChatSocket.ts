@@ -1,5 +1,5 @@
+import { bind } from 'decko';
 import socketIo from 'socket.io';
-import { autobind } from 'core-decorators';
 
 import { Chat, Message } from '../models';
 import { SOCKET_MESSAGE, SOCKET_ERROR } from './constants';
@@ -7,7 +7,7 @@ import { SOCKET_MESSAGE, SOCKET_ERROR } from './constants';
 export class ChatSocket {
   constructor(private io: socketIo.Server) { }
 
-  @autobind
+  @bind
   public async connect(socket: socketIo.Socket) {
     socket.on(SOCKET_MESSAGE, this.handleMessage);
     try {
@@ -17,7 +17,7 @@ export class ChatSocket {
     }
   }
 
-  @autobind
+  @bind
   public async handleMessage(data: Message) {
     const { sender, owner, content } = data;
     if (!content) {
@@ -44,6 +44,7 @@ export class ChatSocket {
     }
   }
 
+  @bind
   private handleError(error: string) {
     this.io.emit(SOCKET_ERROR, error);
   }

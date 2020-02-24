@@ -1,47 +1,36 @@
-import { SwaggerRouter } from 'koa-swagger-decorator';
+import Router from 'koa-router';
 import jwtMiddleware from 'koa-jwt';
 
-import * as controllers from '../controllers';
+import {
+  UserController, AuthController, MessageController, GeneralController,
+} from '../controllers';
 import { CONFIG } from '../config';
 import {
   ROUTE_REGISTER, ROUTE_AUTH, ROUTE_REFRESH_TOKEN, ROUTE_LOGOUT, ROUTE_USERS, ROUTE_USERS_ID,
   ROUTE_MESSAGES, ROUTE_MESSAGES_ID, ROUTE_ROOT,
 } from './constants';
 
-const router = new SwaggerRouter();
+const router = new Router();
 
 // Public routes
-router.get(ROUTE_ROOT, controllers.GeneralController.helloWorld);
-router.post(ROUTE_REGISTER, controllers.AuthController.registerNewUser);
-router.post(ROUTE_AUTH, controllers.AuthController.authenticate);
+router.get(ROUTE_ROOT, GeneralController.helloWorld);
+router.post(ROUTE_REGISTER, AuthController.registerNewUser);
+router.post(ROUTE_AUTH, AuthController.authenticate);
 
 // Private routes
-router.use(jwtMiddleware({ secret: CONFIG.jwt_encryption }).unless({ path: [/^\/swagger-/] }));
-router.post(ROUTE_REFRESH_TOKEN, controllers.AuthController.refreshAccessToken);
-router.post(ROUTE_LOGOUT, controllers.AuthController.logout);
+router.use(jwtMiddleware({ secret: CONFIG.jwt_encryption }));
+router.post(ROUTE_REFRESH_TOKEN, AuthController.refreshAccessToken);
+router.post(ROUTE_LOGOUT, AuthController.logout);
 
-router.get(ROUTE_USERS, controllers.UserController.getUsers);
-router.get(ROUTE_USERS_ID, controllers.UserController.getUserById);
-router.put(ROUTE_USERS, controllers.UserController.updateUser);
-router.delete(ROUTE_USERS_ID, controllers.UserController.deleteUser);
+router.get(ROUTE_USERS, UserController.getUsers);
+router.get(ROUTE_USERS_ID, UserController.getUserById);
+router.put(ROUTE_USERS, UserController.updateUser);
+router.delete(ROUTE_USERS_ID, UserController.deleteUser);
 
-router.get(ROUTE_MESSAGES, controllers.MessageController.getMessages);
-router.post(ROUTE_MESSAGES, controllers.MessageController.postMessage);
-router.patch(ROUTE_MESSAGES_ID, controllers.MessageController.updateMessage);
-router.delete(ROUTE_MESSAGES_ID, controllers.MessageController.deleteMessage);
-router.get(ROUTE_MESSAGES_ID, controllers.MessageController.getMessage);
-
-// Swagger
-router.swagger({
-  title: 'node-typescript-koa-rest',
-  description: 'API REST using NodeJS and KOA framework, typescript.',
-  version: '1.0.0',
-});
-
-Object.values(controllers).forEach((x) => {
-  router.map(x, {
-    doValidation: false,
-  });
-});
+router.get(ROUTE_MESSAGES, MessageController.getMessages);
+router.post(ROUTE_MESSAGES, MessageController.postMessage);
+router.patch(ROUTE_MESSAGES_ID, MessageController.updateMessage);
+router.delete(ROUTE_MESSAGES_ID, MessageController.deleteMessage);
+router.get(ROUTE_MESSAGES_ID, MessageController.getMessage);
 
 export { router };

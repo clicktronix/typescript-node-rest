@@ -24,20 +24,18 @@ export interface IUserModel extends IUser, mongoose.Document {
 const { Schema } = mongoose;
 const SALT_ROUND = 10;
 
-const UserSchema = new Schema<IUserModel>(
+export const UserSchema = new Schema<IUserModel>(
   {
     id: Schema.Types.ObjectId,
     name: {
       type: String,
       required: [true, 'Name is required'],
       trim: true,
-      default: 'Name',
     },
     surname: {
       type: String,
       required: [true, 'Surname is required'],
       trim: true,
-      default: 'Surname',
     },
     email: {
       type: String,
@@ -47,7 +45,6 @@ const UserSchema = new Schema<IUserModel>(
       trim: true,
       maxlength: [50, 'You have exceeded the maximum email length'],
       minlength: [5, 'Email is too short'],
-      default: 'email@gmail.com',
     },
     password: {
       type: String,
@@ -55,7 +52,6 @@ const UserSchema = new Schema<IUserModel>(
       trim: true,
       minlength: [5, 'Password is too short'],
       select: false,
-      default: 'password',
     },
     tokens: {
       type: [String],
@@ -78,37 +74,46 @@ const UserSchema = new Schema<IUserModel>(
 /**
  * Password hash middleware
  */
-UserSchema.pre<IUserModel>('save', async function hashMiddleware() {
-  if (!this.isModified('password')) {
+UserSchema.pre('save', async function hashMiddleware() {
+  if (!(this as IUserModel).isModified('password')) {
     return;
   }
   try {
     const salt = await bcrypt.genSalt(SALT_ROUND);
-    const hash = await bcrypt.hash(this.password, salt);
-    this.password = hash;
+    const hash = await bcrypt.hash((this as IUserModel).password, salt);
+    (this as IUserModel).password = hash;
   } catch (err) {
     return err;
   }
 });
 
+/**
+ * Helper method for validating user's password
+ */
 UserSchema.methods.comparePassword = function comparePassword(pwd: string) {
   return bcrypt.compareSync(pwd, (this as IUserModel).password);
 };
 
+/**
+ * Get full name method
+ */
+UserSchema.virtual('fullName').get(function fullName() {
+  return `${(this as IUserModel).name} ${(this as IUserModel).surname}`;
+});
+
+/**
+ * Helper method for getting jwt token
+ */
 UserSchema.methods.getJWT = function getJWT() {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
   return `Bearer ${jwt.sign({ id: (this as IUserModel)._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime })}`;
 };
 
+/**
+ * Helper method for getting jwt token
+ */
 UserSchema.methods.getRefreshToken = function getRefreshToken() {
-  return R.last((this as IUserModel).tokens);
-};
-
-export const userSwaggerSchema = {
-  name: { type: 'string', example: 'Name' },
-  surname: { type: 'string', example: 'Surname' },
-  email: { type: 'string', example: 'email@gmail.com', required: true },
-  password: { type: 'string', example: 'password' },
+  return R.last(this.tokens);
 };
 
 export const User = mongoose.model<IUserModel>('User', UserSchema);

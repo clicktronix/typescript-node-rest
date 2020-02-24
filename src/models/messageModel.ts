@@ -32,12 +32,5 @@ const MessageSchema = new Schema<MessageModel>({
   },
 });
 
-export const messageSwaggerSchema = {
-  content: { type: 'string', example: 'Message text' },
-  owner: { type: 'string', example: 'owner@gmail.com' },
-  sender: { type: 'string', example: 'sender@gmail.com' },
-  onModel: { type: { enum: ['User', 'Chat'] }, example: 'User' },
-};
-
 export interface MessageModel extends Message, mongoose.Document { }
 export const Message = mongoose.model<MessageModel>('Message', MessageSchema);

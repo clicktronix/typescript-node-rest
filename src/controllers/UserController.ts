@@ -1,23 +1,12 @@
 import { Context } from 'koa';
 import * as httpStatus from 'http-status';
-import {
-  request, summary, tagsAll, body as requestBody, path, responsesAll,
-} from 'koa-swagger-decorator';
 
-import { ROUTE_USERS, ROUTE_USERS_ID } from 'routes/constants';
+import { User } from '../models';
 
-import { User, userSwaggerSchema } from '../models';
-
-@tagsAll(['User'])
-@responsesAll({
-  200: { description: 'Success' },
-  204: { description: 'No content' },
-  400: { description: 'Bad request' },
-  404: { description: 'User not found' },
-})
 export class UserController {
-  @request('get', ROUTE_USERS)
-  @summary('Get user list')
+  /**
+   * GET /users
+   */
   public static async getUsers(ctx: Context) {
     try {
       const users = await User.find({});
@@ -28,9 +17,9 @@ export class UserController {
     }
   }
 
-  @request('get', ROUTE_USERS_ID)
-  @summary('Get user by id')
-  @path({ userId: { type: 'number', required: true } })
+  /**
+   * GET /users/:userId
+   */
   public static async getUserById(ctx: Context) {
     try {
       const user = await User.findById(ctx.request.ctx.params.userId);
@@ -44,14 +33,13 @@ export class UserController {
     }
   }
 
-  @request('put', ROUTE_USERS_ID)
-  @summary('Update user by id')
-  @path({ userId: { type: 'number', required: true } })
-  @requestBody(userSwaggerSchema)
+  /**
+   * PUT /users/:userId
+   */
   public static async updateUser(ctx: Context) {
-    const { body } = ctx.request;
+    const { request } = ctx;
     try {
-      const user = await User.findOneAndUpdate({ email: body.email }, body, { new: true });
+      const user = await User.findOneAndUpdate({ email: request.body.email }, request.body, { new: true });
       if (!user) {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
@@ -65,9 +53,9 @@ export class UserController {
     }
   }
 
-  @request('delete', ROUTE_USERS_ID)
-  @summary('Delete user by id')
-  @path({ userId: { type: 'number', required: true } })
+  /**
+   * DELETE /users/:userId
+   */
   public static async deleteUser(ctx: Context) {
     try {
       await User.deleteOne({ _id: ctx.request.ctx.params.userId });
