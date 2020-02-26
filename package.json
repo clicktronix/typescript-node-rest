@@ -12,6 +12,7 @@
     "start": "ts-node src/index.ts",
     "clean:dist": "rm -rf dist",
     "dev": "better-npm-run dev",
+    "prod": "better-npm-run prod",
     "test": "better-npm-run test",
     "check-types": "tsc -p . --noEmit -w",
     "lint": "eslint . --ext .js,.ts && tsc --noEmit --pretty",
@@ -23,6 +24,13 @@
       "env": {
         "NODE_PATH": "src/",
         "NODE_ENV": "dev"
+      }
+    },
+    "prod": {
+      "command": "ts-node ./src/index.ts",
+      "env": {
+        "NODE_PATH": "src/",
+        "NODE_ENV": "prod"
       }
     },
     "test": {
