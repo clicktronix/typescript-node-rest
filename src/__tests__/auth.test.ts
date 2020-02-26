@@ -2,13 +2,12 @@ import { expect } from 'chai';
 import supertest from 'supertest';
 import * as httpStatus from 'http-status';
 
-import { CONFIG } from 'config';
+import { app } from '../index';
+import { CONFIG } from '../config';
 import {
   ROUTE_AUTH, ROUTE_LOGOUT, ROUTE_USERS, ROUTE_REFRESH_TOKEN, ROUTE_REGISTER,
-} from 'routes/constants';
-
+} from '../routes/constants';
 import { registerUser } from './helpers/auth';
-import { app } from '../src';
 
 const userRequest = {
   email: 'authEmail@gmail.com',

@@ -4,9 +4,8 @@ import * as httpStatus from 'http-status';
 import * as R from 'ramda';
 import supertest from 'supertest';
 
-import { ROUTE_AUTH, ROUTE_USERS, ROUTE_REGISTER } from 'routes/constants';
-
-import { app } from '../src';
+import { app } from '../index';
+import { ROUTE_AUTH, ROUTE_USERS, ROUTE_REGISTER } from '../routes/constants';
 import { registerUser } from './helpers/auth';
 
 const userRequest = {

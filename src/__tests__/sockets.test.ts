@@ -2,10 +2,10 @@ import { expect } from 'chai';
 import ioClient from 'socket.io-client';
 import ioServer from 'socket.io';
 
-import { Socket } from 'sockets';
-import { Message } from 'models';
-import { CONFIG } from 'config';
-import { SOCKET_MESSAGE, SOCKET_ERROR, SOCKET_CONNECT } from 'sockets/constants';
+import { Socket } from '../sockets';
+import { Message } from '../models';
+import { CONFIG } from '../config';
+import { SOCKET_MESSAGE, SOCKET_ERROR, SOCKET_CONNECT } from '../sockets/constants';
 
 const messageRequest = {
   content: 'message',

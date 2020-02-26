@@ -28,10 +28,6 @@
     "strictFunctionTypes": false,
     "emitDecoratorMetadata": true
   },
-  "include": [
-    "src/**/*",
-  ],
-  "exclude": [
-    "tests/**/*",
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "src/__tests__"]
 }

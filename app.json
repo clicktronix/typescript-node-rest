@@ -1,4 +1,3 @@
-  
 {
   "name": "Rest server",
   "description": "A Node.js app using koa, typescript and mongo",
