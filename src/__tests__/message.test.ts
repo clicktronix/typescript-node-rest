@@ -3,10 +3,9 @@ import { Response } from 'koa';
 import * as httpStatus from 'http-status';
 import supertest from 'supertest';
 
-import { ROUTE_AUTH, ROUTE_MESSAGES } from 'routes/constants';
-
+import { app } from '../index';
+import { ROUTE_AUTH, ROUTE_MESSAGES } from '../routes/constants';
 import { registerUser } from './helpers/auth';
-import { app } from '../src';
 
 const userRequest = {
   email: 'userEmail@gmail.com',
