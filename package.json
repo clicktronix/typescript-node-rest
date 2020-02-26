@@ -4,6 +4,7 @@
   "description": "Rest Node.js starter kit",
   "main": "dist/index",
   "typings": "dist/index",
+  "type": "module",
   "engines": {
     "node": "12.13.x"
   },
