@@ -68,7 +68,7 @@ describe('User module', () => {
 
     it('Should update user by id', async () => {
       const res = await server
-        .put(ROUTE_USERS).send(userResponseData.body.data)
+        .put(`${ROUTE_USERS}/${userResponseData.body.data._id}`).send(userResponseData.body.data)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
@@ -77,7 +77,7 @@ describe('User module', () => {
 
     it('Should return error if user does not exist, when it updating', async () => {
       const res = await server
-        .put(ROUTE_USERS)
+        .put(`${ROUTE_USERS}/${INVALID_ID}`)
         .send({
           ...userResponseData.body.data,
           email: '123@mail.ru',
@@ -90,7 +90,7 @@ describe('User module', () => {
 
     it('Should return error on put user if access token is invalid', async () => {
       const res = await server
-        .put(ROUTE_USERS)
+        .put(`${ROUTE_USERS}/${userResponseData.body.data._id}`)
         .send({
           ...userResponseData.body.data,
           email: '123@mail.ru',

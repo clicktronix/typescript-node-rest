@@ -51,7 +51,7 @@ export class UserController {
   public static async updateUser(ctx: Context) {
     const { body } = ctx.request;
     try {
-      const user = await User.findOneAndUpdate({ email: body.email }, body, { new: true });
+      const user = await User.findOneAndUpdate({ _id: ctx.request.ctx.params.userId }, body, { new: true });
       if (!user) {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
