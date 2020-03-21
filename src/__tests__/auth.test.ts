@@ -104,7 +104,6 @@ describe('Auth module', () => {
         .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${user.body.token.accessToken}`)
         .send({
-          email: user.body.data.email,
           refreshToken: user.body.token.refreshToken,
         });
 
@@ -119,7 +118,6 @@ describe('Auth module', () => {
         .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${user.body.token.accessToken}`)
         .send({
-          email: user.body.data.email,
           refreshToken: 'INVALID',
         });
 
@@ -133,7 +131,6 @@ describe('Auth module', () => {
         .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${user.body.token.accessToken}`)
         .send({
-          email: user.body.data.email,
           refreshToken: user.body.token.refreshToken,
         });
 
@@ -145,7 +142,6 @@ describe('Auth module', () => {
         .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${user.body.token.accessToken}`)
         .send({
-          email: user.body.data.email,
           refreshToken: user.body.token.refreshToken,
         });
 
@@ -164,14 +160,12 @@ describe('Auth module', () => {
         .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${firstRes.body.token.accessToken}`)
         .send({
-          email: firstRes.body.data.email,
           refreshToken: firstRes.body.token.refreshToken,
         });
       const secondRefreshTokenRes = await server
         .post(ROUTE_REFRESH_TOKEN)
         .set('Authorization', `${secondRes.body.token.accessToken}`)
         .send({
-          email: secondRes.body.data.email,
           refreshToken: secondRes.body.token.refreshToken,
         });
 

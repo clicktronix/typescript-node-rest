@@ -4,13 +4,22 @@ import * as R from 'ramda';
 import {
   tagsAll, request, summary, body as requestBody, responsesAll,
 } from 'koa-swagger-decorator';
+import * as jwt from 'jsonwebtoken';
 
 import {
   ROUTE_REGISTER, ROUTE_AUTH, ROUTE_LOGOUT, ROUTE_REFRESH_TOKEN,
 } from 'routes/constants';
+import { isObject } from 'shared/types/guards';
 
+import { CONFIG } from '../config';
 import { User, userSwaggerSchema } from '../models/userModel';
 import * as refreshTokenService from '../shared/helpers/refreshToken';
+
+type DecodedToken = {
+  exp: number;
+  iat: number;
+  id: string;
+};
 
 @tagsAll(['Auth'])
 @responsesAll({
@@ -45,7 +54,7 @@ export class AuthController {
   })
   public static async authenticate(ctx: Context) {
     try {
-      const user = await AuthController.getUser(ctx, '+password +tokens');
+      const user = await AuthController.getUserByEmail(ctx, '+password +tokens');
       if (!user.comparePassword(ctx.request.body.password)) {
         return ctx.throw(httpStatus.UNAUTHORIZED, 'Wrong password');
       }
@@ -67,11 +76,9 @@ export class AuthController {
   @request('post', ROUTE_LOGOUT)
   @summary('Logout endpoint')
   public static async logout(ctx: Context) {
-    const { body: { refreshToken } } = ctx.request;
     try {
-      const user = await AuthController.getUser(ctx, '+tokens');
-      const updatedTokens = refreshTokenService.remove(user.tokens, refreshToken);
-      user.tokens = updatedTokens;
+      const user = await AuthController.getUserByToken(ctx, '+tokens');
+      user.tokens = [];
       user.save();
       ctx.status = httpStatus.OK;
       ctx.body = { success: true };
@@ -84,9 +91,9 @@ export class AuthController {
   @summary('Refresh access token endpoint')
   @requestBody({ refreshToken: { type: 'string', required: true } })
   public static async refreshAccessToken(ctx: Context) {
-    const { body: { refreshToken } } = ctx.request;
+    const { refreshToken } = ctx.request.body;
     try {
-      const user = await AuthController.getUser(ctx, '+tokens');
+      const user = await AuthController.getUserByToken(ctx, '+tokens');
       const updatedTokens = refreshTokenService.update(user.tokens, refreshToken);
       user.tokens = updatedTokens;
       user.save();
@@ -102,9 +109,16 @@ export class AuthController {
     }
   }
 
-  private static async getUser(ctx: Context, selectQuery: string) {
+  private static async getUserByEmail(ctx: Context, selectQuery: string) {
     const { body: { email } } = ctx.request;
     const user = await User.findOne({ email }).select(selectQuery);
+    return user || ctx.throw(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  private static async getUserByToken(ctx: Context, selectQuery: string) {
+    const { authorization } = ctx.request.headers;
+    const decoded = jwt.verify(authorization.replace('Bearer ', ''), CONFIG.jwt_encryption);
+    const user = await User.findById(isObject(decoded) && (decoded as DecodedToken).id).select(selectQuery);
     return user || ctx.throw(httpStatus.NOT_FOUND, 'User not found');
   }
 }
