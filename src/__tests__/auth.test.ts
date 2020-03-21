@@ -76,7 +76,6 @@ describe('Auth module', () => {
         .post(ROUTE_LOGOUT)
         .set('Authorization', `${user.body.token.accessToken}`)
         .send({
-          email: user.body.data.email,
           refreshToken: user.body.token.refreshToken,
         });
 
