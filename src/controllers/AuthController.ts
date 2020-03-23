@@ -1,18 +1,18 @@
 import { Context } from 'koa';
-import * as httpStatus from 'http-status';
-import * as R from 'ramda';
+import httpStatus from 'http-status';
+import R from 'ramda';
 import {
   tagsAll, request, summary, body as requestBody, responsesAll,
 } from 'koa-swagger-decorator';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 import {
-  ROUTE_REGISTER, ROUTE_AUTH, ROUTE_LOGOUT, ROUTE_REFRESH_TOKEN,
+  ROUTE_REGISTER, ROUTE_AUTH, ROUTE_LOGOUT, ROUTE_REFRESH_TOKEN, ROUTE_TOKEN_AUTH,
 } from 'routes/constants';
 import { isObject } from 'shared/types/guards';
 
 import { CONFIG } from '../config';
-import { User, userSwaggerSchema } from '../models/userModel';
+import { User, userSwaggerSchema, IUserModel } from '../models/userModel';
 import * as refreshTokenService from '../shared/helpers/refreshToken';
 
 type DecodedToken = {
@@ -58,16 +58,18 @@ export class AuthController {
       if (!user.comparePassword(ctx.request.body.password)) {
         return ctx.throw(httpStatus.UNAUTHORIZED, 'Wrong password');
       }
-      user.tokens = refreshTokenService.add(user.tokens);
-      user.save();
-      ctx.status = httpStatus.OK;
-      ctx.body = {
-        data: R.omit(['password', 'tokens'], user.toJSON()),
-        token: {
-          accessToken: user.getJWT(),
-          refreshToken: user.getRefreshToken(),
-        },
-      };
+      AuthController.prepareUser(ctx, user);
+    } catch (err) {
+      ctx.throw(err.status, err.message);
+    }
+  }
+
+  @request('get', ROUTE_TOKEN_AUTH)
+  @summary('Authenticate user by the token')
+  public static async tokenAuthenticate(ctx: Context) {
+    try {
+      const user = await AuthController.getUserByToken(ctx, '+tokens');
+      AuthController.prepareUser(ctx, user);
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
@@ -107,6 +109,20 @@ export class AuthController {
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
+  }
+
+  private static prepareUser(ctx: Context, usr: IUserModel) {
+    const user = usr;
+    user.tokens = refreshTokenService.add(user.tokens);
+    user.save();
+    ctx.status = httpStatus.OK;
+    ctx.body = {
+      data: R.omit(['password', 'tokens'], user.toJSON()),
+      token: {
+        accessToken: user.getJWT(),
+        refreshToken: user.getRefreshToken(),
+      },
+    };
   }
 
   private static async getUserByEmail(ctx: Context, selectQuery: string) {

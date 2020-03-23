@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import { Response } from 'koa';
-import * as httpStatus from 'http-status';
-import * as R from 'ramda';
+import httpStatus from 'http-status';
+import R from 'ramda';
 import supertest from 'supertest';
 
 import { app } from '../index';
@@ -16,8 +15,8 @@ const userRequest = {
 const INVALID_ID = '5c535bec1234352055129874';
 
 describe('User module', () => {
-  let server: any;
-  let userResponseData: Response;
+  let server: supertest.SuperTest<supertest.Request>;
+  let userResponseData: supertest.Response;
 
   before(async () => {
     try {

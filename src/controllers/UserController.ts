@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import * as httpStatus from 'http-status';
+import httpStatus from 'http-status';
 import {
   request, summary, tagsAll, body as requestBody, path, responsesAll,
 } from 'koa-swagger-decorator';
