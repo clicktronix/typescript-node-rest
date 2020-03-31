@@ -95,7 +95,7 @@ export class AuthController {
   public static async refreshAccessToken(ctx: Context) {
     const { refreshToken } = ctx.request.body;
     try {
-      const user = await AuthController.getUserByToken(ctx, '+tokens');
+      const user = await AuthController.getUserByToken(ctx, '+tokens', true);
       const updatedTokens = refreshTokenService.update(user.tokens, refreshToken);
       user.tokens = updatedTokens;
       user.save();
@@ -131,9 +131,11 @@ export class AuthController {
     return user || ctx.throw(httpStatus.NOT_FOUND, 'User not found');
   }
 
-  private static async getUserByToken(ctx: Context, selectQuery: string) {
+  private static async getUserByToken(ctx: Context, selectQuery: string, ignoreExpiration?: boolean) {
     const { authorization } = ctx.request.headers;
-    const decoded = jwt.verify(authorization.replace('Bearer ', ''), CONFIG.jwt_encryption);
+    const decoded = jwt.verify(authorization.replace('Bearer ', ''), CONFIG.jwt_encryption, {
+      ignoreExpiration,
+    });
     const user = await User.findById(isObject(decoded) && (decoded as DecodedToken).id).select(selectQuery);
     return user || ctx.throw(httpStatus.NOT_FOUND, 'User not found');
   }
