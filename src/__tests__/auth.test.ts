@@ -113,10 +113,10 @@ describe('Auth module', () => {
 
     it('Should return 401 on expired token', async () => {
       const user = await server.post(ROUTE_AUTH).send(userRequest);
-      const expiredToken = jwt.sign({ id: user.body._id }, CONFIG.jwt_encryption, { expiresIn: '0' });
+      const expiredToken = jwt.sign({ id: user.body.data._id }, CONFIG.jwt_encryption, { expiresIn: '0' });
       const res = await server
         .get(ROUTE_USERS)
-        .set('Authorization', expiredToken);
+        .set('Authorization', `Bearer ${expiredToken}`);
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
     });
@@ -125,9 +125,10 @@ describe('Auth module', () => {
   describe(ROUTE_REFRESH_TOKEN, () => {
     it('Should set new access token using refresh token', async () => {
       const user = await server.post(ROUTE_AUTH).send(userRequest);
+      const expiredToken = jwt.sign({ id: user.body.data._id }, CONFIG.jwt_encryption, { expiresIn: '0' });
       const res = await server
         .post(ROUTE_REFRESH_TOKEN)
-        .set('Authorization', `${user.body.token.accessToken}`)
+        .set('Authorization', `Bearer ${expiredToken}`)
         .send({
           refreshToken: user.body.token.refreshToken,
         });
