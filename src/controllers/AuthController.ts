@@ -127,16 +127,27 @@ export class AuthController {
 
   private static async getUserByEmail(ctx: Context, selectQuery: string) {
     const { body: { email } } = ctx.request;
-    const user = await User.findOne({ email }).select(selectQuery);
-    return user || ctx.throw(httpStatus.NOT_FOUND, 'User not found');
+    try {
+      const user = await User.findOne({ email }).select(selectQuery);
+      return user || ctx.throw(httpStatus.NOT_FOUND, 'User not found');
+    } catch (err) {
+      ctx.throw(err.status, err.message);
+    }
   }
 
   private static async getUserByToken(ctx: Context, selectQuery: string, ignoreExpiration?: boolean) {
     const { authorization } = ctx.request.headers;
-    const decoded = jwt.verify(authorization.replace('Bearer ', ''), CONFIG.jwt_encryption, {
-      ignoreExpiration,
-    });
-    const user = await User.findById(isObject(decoded) && (decoded as DecodedToken).id).select(selectQuery);
-    return user || ctx.throw(httpStatus.NOT_FOUND, 'User not found');
+    try {
+      const decoded = jwt.verify(authorization.replace('Bearer ', ''), CONFIG.jwt_encryption, {
+        ignoreExpiration,
+      });
+      const user = await User.findById(isObject(decoded) && (decoded as DecodedToken).id).select(selectQuery);
+      return user || ctx.throw(httpStatus.NOT_FOUND, 'User not found');
+    } catch (err) {
+      if (err.name === 'TokenExpiredError') {
+        err.status = 401;
+      }
+      ctx.throw(err.status, err.message);
+    }
   }
 }

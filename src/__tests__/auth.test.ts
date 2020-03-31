@@ -80,7 +80,7 @@ describe('Auth module', () => {
         { id: registeredUser.body.data._id },
         CONFIG.jwt_encryption, { expiresIn: CONFIG.jwt_expiration },
       );
-      const res = await server.get(ROUTE_TOKEN_AUTH).set('Authorization', `${token}`);
+      const res = await server.get(ROUTE_TOKEN_AUTH).set('Authorization', `Bearer ${token}`);
 
       expect(res.status).to.equal(httpStatus.OK);
       expect(res.body.data).to.be.an('object');
@@ -93,9 +93,17 @@ describe('Auth module', () => {
         { id: INVALID_ID },
         CONFIG.jwt_encryption, { expiresIn: CONFIG.jwt_expiration },
       );
-      const res = await server.get(ROUTE_TOKEN_AUTH).set('Authorization', `${token}`);
+      const res = await server.get(ROUTE_TOKEN_AUTH).set('Authorization', `Bearer ${token}`);
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
+    });
+
+    it('Should return 401, if token expired', async () => {
+      const user = await server.post(ROUTE_AUTH).send(userRequest);
+      const expiredToken = jwt.sign({ id: user.body.data._id }, CONFIG.jwt_encryption, { expiresIn: '0' });
+      const res = await server.get(ROUTE_TOKEN_AUTH).set('Authorization', `Bearer ${expiredToken}`);
+
+      expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
     });
 
     it('Should set invalid refresh tokens after logout', async () => {
