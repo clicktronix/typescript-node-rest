@@ -22,7 +22,7 @@ export class UserController {
     try {
       const users = await User.find({});
       ctx.status = httpStatus.OK;
-      ctx.body = { data: users || [] };
+      ctx.body = { users: users || [] };
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
@@ -38,7 +38,7 @@ export class UserController {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
       ctx.status = httpStatus.OK;
-      ctx.body = { data: user.toJSON() };
+      ctx.body = { user: user.toJSON() };
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
@@ -58,7 +58,7 @@ export class UserController {
       ctx.status = httpStatus.OK;
       ctx.body = {
         message: 'User updated',
-        data: user.toJSON(),
+        user: user.toJSON(),
       };
     } catch (err) {
       ctx.throw(err.status, err.message);

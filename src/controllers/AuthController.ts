@@ -117,7 +117,7 @@ export class AuthController {
     user.save();
     ctx.status = httpStatus.OK;
     ctx.body = {
-      data: R.omit(['password', 'tokens'], user.toJSON()),
+      user: R.omit(['password', 'tokens'], user.toJSON()),
       token: {
         accessToken: user.getJWT(),
         refreshToken: user.getRefreshToken(),
