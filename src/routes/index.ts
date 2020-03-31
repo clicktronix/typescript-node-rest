@@ -15,11 +15,11 @@ router.get(ROUTE_ROOT, controllers.GeneralController.helloWorld);
 router.get(ROUTE_TOKEN_AUTH, controllers.AuthController.tokenAuthenticate);
 router.post(ROUTE_REGISTER, controllers.AuthController.registerNewUser);
 router.post(ROUTE_AUTH, controllers.AuthController.authenticate);
+router.post(ROUTE_REFRESH_TOKEN, controllers.AuthController.refreshAccessToken);
+router.post(ROUTE_LOGOUT, controllers.AuthController.logout);
 
 // Private routes
 router.use(jwtMiddleware({ secret: CONFIG.jwt_encryption }).unless({ path: [/^\/swagger-/] }));
-router.post(ROUTE_REFRESH_TOKEN, controllers.AuthController.refreshAccessToken);
-router.post(ROUTE_LOGOUT, controllers.AuthController.logout);
 
 router.get(ROUTE_USERS, controllers.UserController.getUsers);
 router.get(ROUTE_USERS_ID, controllers.UserController.getUserById);
