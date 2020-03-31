@@ -68,7 +68,7 @@ export class AuthController {
   @summary('Authenticate user by the token')
   public static async tokenAuthenticate(ctx: Context) {
     try {
-      const user = await AuthController.getUserByToken(ctx, '+tokens');
+      const user = await AuthController.getUserByToken(ctx, '+tokens', true);
       AuthController.prepareUser(ctx, user);
     } catch (err) {
       ctx.throw(err.status, err.message);
