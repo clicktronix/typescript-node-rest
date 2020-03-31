@@ -15,6 +15,7 @@ router.get(ROUTE_ROOT, controllers.GeneralController.helloWorld);
 router.post(ROUTE_REGISTER, controllers.AuthController.registerNewUser);
 router.post(ROUTE_AUTH, controllers.AuthController.authenticate);
 router.post(ROUTE_REFRESH_TOKEN, controllers.AuthController.refreshAccessToken);
+router.get(ROUTE_TOKEN_AUTH, controllers.AuthController.tokenAuthenticate);
 
 // Private routes
 router.use(jwtMiddleware({ secret: CONFIG.jwt_encryption }).unless({ path: [/^\/swagger-/] }));
