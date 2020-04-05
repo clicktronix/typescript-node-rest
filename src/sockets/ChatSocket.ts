@@ -11,7 +11,7 @@ export class ChatSocket {
   public async connect(socket: socketIo.Socket) {
     socket.on(SOCKET_MESSAGE, this.handleMessage);
     try {
-      await this.checkMainChat();
+      await this.checkChatExisting();
     } catch (error) {
       this.handleError(error.message);
     }
@@ -19,7 +19,7 @@ export class ChatSocket {
 
   @autobind
   public async handleMessage(data: Message) {
-    const { sender, owner, content } = data;
+    const { sender, content } = data;
     if (!content) {
       this.handleError('Please enter a message');
       return;
@@ -33,7 +33,6 @@ export class ChatSocket {
       chat[0].messages.push(
         new Message({
           content,
-          owner,
           sender,
         }),
       );
@@ -48,12 +47,11 @@ export class ChatSocket {
     this.io.emit(SOCKET_ERROR, error);
   }
 
-  private async checkMainChat() {
+  private async checkChatExisting() {
     try {
       const isChatExist = await Chat.exists({ type: 'main-chat' });
       if (!isChatExist) {
         const chat = new Chat({
-          type: 'main-chat',
           messages: [],
         });
         await chat.save();
