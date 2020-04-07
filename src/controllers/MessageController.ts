@@ -122,9 +122,6 @@ export class MessageController {
       if (!message || !user) {
         return ctx.throw(httpStatus.NOT_FOUND, 'Message or user not found');
       }
-      if (!message.owner._id.equals(user._id)) {
-        return ctx.throw(httpStatus.UNAUTHORIZED, 'You have not permissions');
-      }
       return message;
     } catch (err) {
       ctx.throw(err.status, err.message);
