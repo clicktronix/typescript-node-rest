@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 
-import { IUserModel } from '../../models';
+import { UserModel } from '../../models';
 import { CONFIG } from '../../config';
 import { isString } from '../types/guards';
 
@@ -10,5 +10,5 @@ export function decodeToken(usersToken: string) {
   if (!decoded || isString(decoded)) {
     throw new Error('Invalid token');
   }
-  return decoded as IUserModel;
+  return decoded as UserModel;
 }
