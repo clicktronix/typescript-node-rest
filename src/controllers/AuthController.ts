@@ -12,7 +12,7 @@ import {
 import { isObject } from 'shared/types/guards';
 
 import { CONFIG } from '../config';
-import { User, userSwaggerSchema, IUserModel } from '../models/userModel';
+import { User, userSwaggerSchema, UserModel } from '../models/userModel';
 import * as refreshTokenService from '../shared/helpers/refreshToken';
 
 type DecodedToken = {
@@ -111,7 +111,7 @@ export class AuthController {
     }
   }
 
-  private static prepareUser(ctx: Context, usr: IUserModel) {
+  private static prepareUser(ctx: Context, usr: UserModel) {
     const user = usr;
     user.tokens = refreshTokenService.add(user.tokens);
     user.save();

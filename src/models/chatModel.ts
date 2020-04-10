@@ -4,9 +4,12 @@ import { MessageModel } from './messageModel';
 
 export interface Chat {
   messages: MessageModel[];
+  getSingleton: () => void;
 }
 
 const { Schema } = mongoose;
+
+export interface ChatModel extends Chat, mongoose.Document { }
 
 const ChatSchema = new Schema<ChatModel>({
   id: Schema.Types.ObjectId,
@@ -16,5 +19,4 @@ const ChatSchema = new Schema<ChatModel>({
   }],
 });
 
-export interface ChatModel extends Chat, mongoose.Document { }
 export const Chat = mongoose.model<ChatModel>('Chat', ChatSchema);

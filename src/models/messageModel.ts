@@ -1,10 +1,10 @@
 import * as mongoose from 'mongoose';
 
-import { IUserModel } from './userModel';
+import { UserModel } from './userModel';
 
 export interface Message {
   content: string;
-  sender: IUserModel;
+  sender: UserModel;
 }
 
 const { Schema } = mongoose;
