@@ -3,6 +3,8 @@ import bodyParser from 'koa-bodyparser';
 import socketIo from 'socket.io';
 import cors from '@koa/cors';
 import helmet from 'koa-helmet';
+import serve from 'koa-static';
+import logger from 'koa-logger';
 
 import { Socket } from './sockets';
 import { router } from './routes';
@@ -28,8 +30,10 @@ class App {
       .use(helmet())
       .use(cors())
       .use(bodyParser())
+      .use(serve('public'))
       .use(router.routes())
-      .use(router.allowedMethods());
+      .use(router.allowedMethods())
+      .use(logger());
   }
 }
 
