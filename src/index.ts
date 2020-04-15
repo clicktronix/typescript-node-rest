@@ -32,7 +32,7 @@ class App {
       .use(bodyParser())
       .use(router.routes())
       .use(router.allowedMethods())
-      .use(serve('public'))
+      .use(serve(`${__dirname}/public`))
       .use(logger());
   }
 }
