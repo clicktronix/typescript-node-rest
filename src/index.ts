@@ -37,7 +37,6 @@ class App {
       .use(mount('/', frontendStatic))
       .use(router.routes())
       .use(router.allowedMethods())
-      .use(serve(`${__dirname}/public`))
       .use(logger());
   }
 }
