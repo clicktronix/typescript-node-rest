@@ -4,6 +4,7 @@ import socketIo from 'socket.io';
 import cors from '@koa/cors';
 import helmet from 'koa-helmet';
 import serve from 'koa-static';
+import mount from 'koa-mount';
 import logger from 'koa-logger';
 
 import { Socket } from './sockets';
@@ -26,10 +27,14 @@ class App {
   }
 
   private setMiddlewares() {
+    const frontendStatic = new Koa();
+    frontendStatic.use(serve(`${__dirname}/public`));
+
     this.app
       .use(helmet())
       .use(cors())
       .use(bodyParser())
+      .use(mount('/', frontendStatic))
       .use(router.routes())
       .use(router.allowedMethods())
       .use(serve(`${__dirname}/public`))
