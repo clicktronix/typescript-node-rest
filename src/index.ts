@@ -30,9 +30,9 @@ class App {
       .use(helmet())
       .use(cors())
       .use(bodyParser())
-      .use(serve('public'))
       .use(router.routes())
       .use(router.allowedMethods())
+      .use(serve('public'))
       .use(logger());
   }
 }
