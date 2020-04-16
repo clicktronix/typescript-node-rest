@@ -28,7 +28,7 @@ class App {
 
   private setMiddlewares() {
     const frontendStatic = new Koa();
-    frontendStatic.use(serve(`${__dirname}/public`));
+    frontendStatic.use(serve('public'));
 
     this.app
       .use(helmet())
