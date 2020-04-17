@@ -1,0 +1,12 @@
+{
+  "[typescript]": {
+        "editor.formatOnType": false,
+        "editor.formatOnSave": true
+    },
+    "[typescriptreact]": {
+        "editor.formatOnType": false,
+        "editor.formatOnSave": true
+    },
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "typescript.tsdk": "node_modules/typescript/lib",
+}
