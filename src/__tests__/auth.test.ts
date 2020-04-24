@@ -109,11 +109,8 @@ describe('Auth module', () => {
     it('Should set invalid refresh tokens after logout', async () => {
       const user = await server.post(ROUTE_AUTH).send(userRequest);
       const res = await server
-        .post(ROUTE_LOGOUT)
-        .set('Authorization', `${user.body.token.accessToken}`)
-        .send({
-          refreshToken: user.body.token.refreshToken,
-        });
+        .get(ROUTE_LOGOUT)
+        .set('Authorization', `${user.body.token.accessToken}`);
 
       expect(res.status).to.equal(httpStatus.OK);
       expect(res.body.success).to.equal(true);
