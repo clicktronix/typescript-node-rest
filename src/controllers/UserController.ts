@@ -5,8 +5,7 @@ import {
 } from 'koa-swagger-decorator';
 
 import { ROUTE_USERS, ROUTE_USERS_ID } from 'routes/constants';
-
-import { User, userSwaggerSchema } from '../models';
+import { User, userSwaggerSchema } from 'models';
 
 @tagsAll(['User'])
 @responsesAll({

@@ -5,11 +5,10 @@ import {
 } from 'koa-swagger-decorator';
 
 import { ROUTE_MESSAGES, ROUTE_MESSAGES_ID } from 'routes/constants';
-
 import {
   Message, User, UserModel, messageSwaggerSchema,
-} from '../models';
-import { decodeToken } from '../shared/helpers/decodeToken';
+} from 'models';
+import { decodeToken } from 'shared/helpers/decodeToken';
 
 @tagsAll(['Message'])
 @responsesAll({

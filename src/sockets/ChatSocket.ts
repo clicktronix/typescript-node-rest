@@ -1,7 +1,8 @@
 import socketIo from 'socket.io';
 import { autobind } from 'core-decorators';
 
-import { Chat, Message } from '../models';
+import { Chat, Message } from 'models';
+
 import { SOCKET_MESSAGE, SOCKET_ERROR } from './constants';
 
 export class ChatSocket {

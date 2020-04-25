@@ -10,10 +10,9 @@ import {
   ROUTE_REGISTER, ROUTE_AUTH, ROUTE_LOGOUT, ROUTE_REFRESH_TOKEN, ROUTE_TOKEN_AUTH,
 } from 'routes/constants';
 import { isObject } from 'shared/types/guards';
-
-import { CONFIG } from '../config';
-import { User, userSwaggerSchema, UserModel } from '../models/userModel';
-import * as refreshTokenService from '../shared/helpers/refreshToken';
+import { CONFIG } from 'config';
+import { User, userSwaggerSchema, UserModel } from 'models/userModel';
+import * as refreshTokenService from 'shared/helpers/refreshToken';
 
 type DecodedToken = {
   exp: number;
