@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Response } from 'koa';
-import * as httpStatus from 'http-status';
+import httpStatus from 'http-status';
 import supertest from 'supertest';
 
 import { app } from '../index';

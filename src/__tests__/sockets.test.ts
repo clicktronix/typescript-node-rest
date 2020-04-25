@@ -9,7 +9,6 @@ import { SOCKET_MESSAGE, SOCKET_ERROR, SOCKET_CONNECT } from '../sockets/constan
 
 const messageRequest = {
   content: 'message',
-  owner: 'userEmail@gmail.com',
   sender: 'userEmail@gmail.com',
 };
 
@@ -46,7 +45,6 @@ describe('Socket module', () => {
         expect(req).to.deep.equal({
           content: 'message',
           sender: 'userEmail@gmail.com',
-          owner: 'userEmail@gmail.com',
         });
         done();
       });

@@ -22,7 +22,7 @@ export class UserController {
     try {
       const users = await User.find({});
       ctx.status = httpStatus.OK;
-      ctx.body = { data: users || [] };
+      ctx.body = { users: users || [] };
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
@@ -37,7 +37,7 @@ export class UserController {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
       ctx.status = httpStatus.OK;
-      ctx.body = { data: user.toJSON() };
+      ctx.body = { user: user.toJSON() };
     } catch (err) {
       ctx.throw(err.status, err.message);
     }
@@ -49,14 +49,14 @@ export class UserController {
   public static async updateUser(ctx: Context) {
     const { body } = ctx.request;
     try {
-      const user = await User.findOneAndUpdate({ email: body.email }, body, { new: true });
+      const user = await User.findOneAndUpdate({ _id: ctx.request.ctx.params.userId }, body, { new: true });
       if (!user) {
         return ctx.throw(httpStatus.NOT_FOUND, 'User not found');
       }
       ctx.status = httpStatus.OK;
       ctx.body = {
         message: 'User updated',
-        data: user.toJSON(),
+        user: user.toJSON(),
       };
     } catch (err) {
       ctx.throw(err.status, err.message);

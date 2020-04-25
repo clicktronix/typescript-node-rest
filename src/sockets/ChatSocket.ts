@@ -10,34 +10,29 @@ export class ChatSocket {
   @autobind
   public async connect(socket: socketIo.Socket) {
     socket.on(SOCKET_MESSAGE, this.handleMessage);
-    try {
-      await this.checkMainChat();
-    } catch (error) {
-      this.handleError(error.message);
-    }
+    this.checkChatExisting();
   }
 
   @autobind
   public async handleMessage(data: Message) {
-    const { sender, owner, content } = data;
+    const { sender, content } = data;
     if (!content) {
       this.handleError('Please enter a message');
       return;
     }
     try {
-      const chat = await Chat.find({ type: 'main-chat' });
+      const chat = await Chat.findOne();
       if (!chat) {
         this.handleError('Chat not found');
         return;
       }
-      chat[0].messages.push(
+      chat.messages.push(
         new Message({
           content,
-          owner,
           sender,
         }),
       );
-      await chat[0].save();
+      await chat.save();
       this.io.emit('message', data);
     } catch (error) {
       this.handleError(error.message);
@@ -48,12 +43,10 @@ export class ChatSocket {
     this.io.emit(SOCKET_ERROR, error);
   }
 
-  private async checkMainChat() {
+  private async checkChatExisting() {
     try {
-      const isChatExist = await Chat.exists({ type: 'main-chat' });
-      if (!isChatExist) {
+      if (!await Chat.exists({})) {
         const chat = new Chat({
-          type: 'main-chat',
           messages: [],
         });
         await chat.save();

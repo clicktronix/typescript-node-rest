@@ -6,25 +6,25 @@ import * as R from 'ramda';
 import { CONFIG } from '../config';
 import { MessageModel } from './messageModel';
 
-export interface IUser {
+export type User = {
   email: string;
   name: string;
   surname: string;
   password: string;
   tokens: string[];
   messages: MessageModel[];
-}
+};
 
-export interface IUserModel extends IUser, mongoose.Document {
+export type UserModel = User & mongoose.Document & {
   comparePassword(pwd: string): boolean;
   getJWT(): string;
   getRefreshToken(): string | undefined;
-}
+};
 
 const { Schema } = mongoose;
 const SALT_ROUND = 10;
 
-const UserSchema = new Schema<IUserModel>(
+const UserSchema = new Schema<UserModel>(
   {
     id: Schema.Types.ObjectId,
     name: {
@@ -78,7 +78,7 @@ const UserSchema = new Schema<IUserModel>(
 /**
  * Password hash middleware
  */
-UserSchema.pre<IUserModel>('save', async function hashMiddleware() {
+UserSchema.pre<UserModel>('save', async function hashMiddleware() {
   if (!this.isModified('password')) {
     return;
   }
@@ -92,16 +92,16 @@ UserSchema.pre<IUserModel>('save', async function hashMiddleware() {
 });
 
 UserSchema.methods.comparePassword = function comparePassword(pwd: string) {
-  return bcrypt.compareSync(pwd, (this as IUserModel).password);
+  return bcrypt.compareSync(pwd, (this as UserModel).password);
 };
 
 UserSchema.methods.getJWT = function getJWT() {
   const expirationTime = parseInt(CONFIG.jwt_expiration, 10);
-  return `Bearer ${jwt.sign({ id: (this as IUserModel)._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime })}`;
+  return `Bearer ${jwt.sign({ id: (this as UserModel)._id }, CONFIG.jwt_encryption, { expiresIn: expirationTime })}`;
 };
 
 UserSchema.methods.getRefreshToken = function getRefreshToken() {
-  return R.last((this as IUserModel).tokens);
+  return R.last((this as UserModel).tokens);
 };
 
 export const userSwaggerSchema = {
@@ -111,4 +111,4 @@ export const userSwaggerSchema = {
   password: { type: 'string', example: 'password' },
 };
 
-export const User = mongoose.model<IUserModel>('User', UserSchema);
+export const User = mongoose.model<UserModel>('User', UserSchema);

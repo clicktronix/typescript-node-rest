@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import * as httpStatus from 'http-status';
+import httpStatus from 'http-status';
 import {
   request, summary, tagsAll, body as requestBody, responsesAll,
 } from 'koa-swagger-decorator';
@@ -7,7 +7,7 @@ import {
 import { ROUTE_MESSAGES, ROUTE_MESSAGES_ID } from 'routes/constants';
 
 import {
-  Message, User, IUserModel, messageSwaggerSchema,
+  Message, User, UserModel, messageSwaggerSchema,
 } from '../models';
 import { decodeToken } from '../shared/helpers/decodeToken';
 
@@ -112,15 +112,12 @@ export class MessageController {
     }
   }
 
-  private static async findMessage(ctx: Context, usersMeta: IUserModel) {
+  private static async findMessage(ctx: Context, usersMeta: UserModel) {
     try {
       const message = await Message.findById(ctx.request.ctx.params.messageId);
       const user = await User.findById(usersMeta.id);
       if (!message || !user) {
         return ctx.throw(httpStatus.NOT_FOUND, 'Message or user not found');
-      }
-      if (!message.owner._id.equals(user._id)) {
-        return ctx.throw(httpStatus.UNAUTHORIZED, 'You have not permissions');
       }
       return message;
     } catch (err) {

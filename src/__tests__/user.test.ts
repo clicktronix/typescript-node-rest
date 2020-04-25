@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import { Response } from 'koa';
-import * as httpStatus from 'http-status';
-import * as R from 'ramda';
+import httpStatus from 'http-status';
+import R from 'ramda';
 import supertest from 'supertest';
 
 import { app } from '../index';
@@ -16,8 +15,8 @@ const userRequest = {
 const INVALID_ID = '5c535bec1234352055129874';
 
 describe('User module', () => {
-  let server: any;
-  let userResponseData: Response;
+  let server: supertest.SuperTest<supertest.Request>;
+  let userResponseData: supertest.Response;
 
   before(async () => {
     try {
@@ -36,16 +35,16 @@ describe('User module', () => {
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
-      expect(res.body.data).to.be.an('array');
+      expect(res.body.users).to.be.an('array');
     });
 
     it('Should return user by id', async () => {
       const res = await server
-        .get(`${ROUTE_USERS}/${userResponseData.body.data._id}`)
+        .get(`${ROUTE_USERS}/${userResponseData.body.user._id}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
-      expect(R.omit(['updatedAt'], res.body.data)).to.deep.equal(R.omit(['updatedAt'], userResponseData.body.data));
+      expect(R.omit(['updatedAt'], res.body.user)).to.deep.equal(R.omit(['updatedAt'], userResponseData.body.user));
     });
 
     it('Should return error if user does not exist', async () => {
@@ -59,7 +58,7 @@ describe('User module', () => {
 
     it('Should return error on get user if access token is invalid', async () => {
       const res = await server
-        .get(`${ROUTE_USERS}/${userResponseData.body.data._id}`)
+        .get(`${ROUTE_USERS}/${userResponseData.body.user._id}`)
         .set('Authorization', INVALID_ID);
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
@@ -68,18 +67,18 @@ describe('User module', () => {
 
     it('Should update user by id', async () => {
       const res = await server
-        .put(ROUTE_USERS).send(userResponseData.body.data)
+        .put(`${ROUTE_USERS}/${userResponseData.body.user._id}`).send(userResponseData.body.user)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.OK);
-      expect(R.omit(['updatedAt'], res.body.data)).to.deep.equal(R.omit(['updatedAt'], userResponseData.body.data));
+      expect(R.omit(['updatedAt'], res.body.user)).to.deep.equal(R.omit(['updatedAt'], userResponseData.body.user));
     });
 
     it('Should return error if user does not exist, when it updating', async () => {
       const res = await server
-        .put(ROUTE_USERS)
+        .put(`${ROUTE_USERS}/${INVALID_ID}`)
         .send({
-          ...userResponseData.body.data,
+          ...userResponseData.body.user,
           email: '123@mail.ru',
         })
         .set('Authorization', userResponseData.body.token.accessToken);
@@ -90,9 +89,9 @@ describe('User module', () => {
 
     it('Should return error on put user if access token is invalid', async () => {
       const res = await server
-        .put(ROUTE_USERS)
+        .put(`${ROUTE_USERS}/${userResponseData.body.user._id}`)
         .send({
-          ...userResponseData.body.data,
+          ...userResponseData.body.user,
           email: '123@mail.ru',
         })
         .set('Authorization', INVALID_ID);
@@ -117,7 +116,7 @@ describe('User module', () => {
         .send(newUser)
         .set('Authorization', userResponseData.body.token.accessToken);
       const res = await server
-        .delete(`${ROUTE_USERS}/${registeredUser.body.data._id}`)
+        .delete(`${ROUTE_USERS}/${registeredUser.body.user._id}`)
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NO_CONTENT);
@@ -132,7 +131,7 @@ describe('User module', () => {
 
     it('Should return error on delete user if access token is invalid', async () => {
       const res = await server
-        .delete(`${ROUTE_USERS}/${userResponseData.body.data._id}`)
+        .delete(`${ROUTE_USERS}/${userResponseData.body.user._id}`)
         .set('Authorization', INVALID_ID);
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);

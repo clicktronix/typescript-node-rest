@@ -5,7 +5,7 @@ import * as controllers from '../controllers';
 import { CONFIG } from '../config';
 import {
   ROUTE_REGISTER, ROUTE_AUTH, ROUTE_REFRESH_TOKEN, ROUTE_LOGOUT, ROUTE_USERS, ROUTE_USERS_ID,
-  ROUTE_MESSAGES, ROUTE_MESSAGES_ID,
+  ROUTE_MESSAGES, ROUTE_MESSAGES_ID, ROUTE_TOKEN_AUTH,
 } from './constants';
 
 const router = new SwaggerRouter();
@@ -13,11 +13,13 @@ const router = new SwaggerRouter();
 // Public routes
 router.post(ROUTE_REGISTER, controllers.AuthController.registerNewUser);
 router.post(ROUTE_AUTH, controllers.AuthController.authenticate);
+router.post(ROUTE_REFRESH_TOKEN, controllers.AuthController.refreshAccessToken);
+router.get(ROUTE_TOKEN_AUTH, controllers.AuthController.tokenAuthenticate);
 
 // Private routes
 router.use(jwtMiddleware({ secret: CONFIG.jwt_encryption }).unless({ path: [/^\/swagger-/] }));
-router.post(ROUTE_REFRESH_TOKEN, controllers.AuthController.refreshAccessToken);
-router.post(ROUTE_LOGOUT, controllers.AuthController.logout);
+router.get(ROUTE_TOKEN_AUTH, controllers.AuthController.tokenAuthenticate);
+router.get(ROUTE_LOGOUT, controllers.AuthController.logout);
 
 router.get(ROUTE_USERS, controllers.UserController.getUsers);
 router.get(ROUTE_USERS_ID, controllers.UserController.getUserById);
