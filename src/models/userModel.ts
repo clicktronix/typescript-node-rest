@@ -1,7 +1,7 @@
-import * as mongoose from 'mongoose';
-import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
-import * as R from 'ramda';
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import R from 'ramda';
 
 import { CONFIG } from 'config';
 
