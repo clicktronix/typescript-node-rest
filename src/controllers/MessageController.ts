@@ -1,15 +1,14 @@
 import { Context } from 'koa';
 import httpStatus from 'http-status';
 import {
-  request, summary, tagsAll, body as requestBody, responsesAll, path,
+  request, summary, tagsAll, body as requestBody, responsesAll,
 } from 'koa-swagger-decorator';
 
 import { ROUTE_MESSAGES, ROUTE_MESSAGES_ID } from 'routes/constants';
-
 import {
   Message, User, UserModel, messageSwaggerSchema,
-} from '../models';
-import { decodeToken } from '../shared/helpers/decodeToken';
+} from 'models';
+import { decodeToken } from 'shared/helpers/decodeToken';
 
 @tagsAll(['Message'])
 @responsesAll({
@@ -36,7 +35,6 @@ export class MessageController {
 
   @request('get', ROUTE_MESSAGES_ID)
   @summary('Get message by id')
-  @path({ messageId: { type: 'string', required: true } })
   @requestBody(messageSwaggerSchema)
   public static async getMessage(ctx: Context) {
     const { headers } = ctx.request;
@@ -81,7 +79,6 @@ export class MessageController {
 
   @request('patch', ROUTE_MESSAGES_ID)
   @summary('Update message by id')
-  @path({ messageId: { type: 'string', required: true } })
   @requestBody(messageSwaggerSchema)
   public static async updateMessage(ctx: Context) {
     const { body, headers } = ctx.request;
@@ -100,7 +97,6 @@ export class MessageController {
 
   @request('delete', ROUTE_MESSAGES_ID)
   @summary('Delete message by id')
-  @path({ messageId: { type: 'string', required: true } })
   public static async deleteMessage(ctx: Context) {
     const { headers } = ctx.request;
     try {

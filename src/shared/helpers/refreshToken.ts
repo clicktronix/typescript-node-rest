@@ -1,6 +1,6 @@
-import * as R from 'ramda';
-import * as uuid from 'uuid';
-import * as httpStatus from 'http-status';
+import R from 'ramda';
+import uuid from 'uuid';
+import httpStatus from 'http-status';
 
 import { HttpRequestError } from './HttpRequestError';
 

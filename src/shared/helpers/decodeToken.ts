@@ -1,4 +1,4 @@
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 import { UserModel } from '../../models';
 import { CONFIG } from '../../config';

@@ -1,8 +1,9 @@
 import { SwaggerRouter } from 'koa-swagger-decorator';
 import jwtMiddleware from 'koa-jwt';
 
-import * as controllers from '../controllers';
-import { CONFIG } from '../config';
+import * as controllers from 'controllers';
+import { CONFIG } from 'config';
+
 import {
   ROUTE_REGISTER, ROUTE_AUTH, ROUTE_REFRESH_TOKEN, ROUTE_LOGOUT, ROUTE_USERS, ROUTE_USERS_ID,
   ROUTE_MESSAGES, ROUTE_MESSAGES_ID, ROUTE_TOKEN_AUTH,
