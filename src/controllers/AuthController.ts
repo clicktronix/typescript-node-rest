@@ -64,7 +64,7 @@ export class AuthController {
     }
   }
 
-  @request('post', ROUTE_LOGOUT)
+  @request('get', ROUTE_LOGOUT)
   @summary('Logout endpoint')
   public static async logout(ctx: Context) {
     const { body: { refreshToken } } = ctx.request;

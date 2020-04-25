@@ -5,13 +5,12 @@ import * as controllers from '../controllers';
 import { CONFIG } from '../config';
 import {
   ROUTE_REGISTER, ROUTE_AUTH, ROUTE_REFRESH_TOKEN, ROUTE_LOGOUT, ROUTE_USERS, ROUTE_USERS_ID,
-  ROUTE_MESSAGES, ROUTE_MESSAGES_ID, ROUTE_ROOT,
+  ROUTE_MESSAGES, ROUTE_MESSAGES_ID,
 } from './constants';
 
 const router = new SwaggerRouter();
 
 // Public routes
-router.get(ROUTE_ROOT, controllers.GeneralController.helloWorld);
 router.post(ROUTE_REGISTER, controllers.AuthController.registerNewUser);
 router.post(ROUTE_AUTH, controllers.AuthController.authenticate);
 
