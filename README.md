@@ -5,11 +5,8 @@ Starter kit for simple REST backend applications using NodeJS, Koa, MongoDB
 
 In the project directory, you can run:
 
-### `npm run dev`
-to start development build
+#### `npm run dev` - to start development build
 
-### `npm run prod`
-to start production build
+#### `npm run prod` - to start production build
 
-### `npm run test`
-to start tests
+#### `npm run test` - to start tests
