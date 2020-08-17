@@ -53,7 +53,7 @@ describe('User module', () => {
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should return error on get user if access token is invalid', async () => {
@@ -62,7 +62,7 @@ describe('User module', () => {
         .set('Authorization', INVALID_ID);
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should update user by id', async () => {
@@ -84,7 +84,7 @@ describe('User module', () => {
         .set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should return error on put user if access token is invalid', async () => {
@@ -97,7 +97,7 @@ describe('User module', () => {
         .set('Authorization', INVALID_ID);
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should delete user', async () => {
@@ -126,7 +126,7 @@ describe('User module', () => {
       const res = await server.delete(ROUTE_USERS).set('Authorization', userResponseData.body.token.accessToken);
 
       expect(res.status).to.equal(httpStatus.METHOD_NOT_ALLOWED);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should return error on delete user if access token is invalid', async () => {
@@ -135,7 +135,7 @@ describe('User module', () => {
         .set('Authorization', INVALID_ID);
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
   });
 });

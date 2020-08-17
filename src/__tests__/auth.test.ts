@@ -48,7 +48,7 @@ describe('Auth module', () => {
       });
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should return 404, if user does not exist', async () => {
@@ -58,21 +58,21 @@ describe('Auth module', () => {
       });
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should return 404, if email is empty', async () => {
       const res = await server.post(ROUTE_AUTH).send({ password: '12345' });
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should return 404, if password is empty', async () => {
       const res = await server.post(ROUTE_AUTH).send({ email: 'mail' });
 
       expect(res.status).to.equal(httpStatus.NOT_FOUND);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should successfully login user by access token', async () => {
@@ -153,7 +153,7 @@ describe('Auth module', () => {
         });
 
       expect(res.status).to.equal(httpStatus.UNAUTHORIZED);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should use refresh token only once', async () => {
@@ -177,7 +177,7 @@ describe('Auth module', () => {
         });
 
       expect(secondRes.status).to.equal(httpStatus.UNAUTHORIZED);
-      expect(secondRes.error.message).to.be.an('string');
+      expect(secondRes.error && secondRes.error.message).to.be.an('string');
     });
 
     it('Must be valid multiple refresh tokens', async () => {
@@ -214,7 +214,7 @@ describe('Auth module', () => {
       const res = await server.post(ROUTE_REGISTER).send(userRequest);
 
       expect(res.status).to.equal(httpStatus.FORBIDDEN);
-      expect(res.error.message).to.be.an('string');
+      expect(res.error && res.error.message).to.be.an('string');
     });
 
     it('Should register new user', async () => {
