@@ -70,7 +70,7 @@
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-prettier": "^3.4.1",
-    "mocha": "^8.4.0",
+    "mocha": "^10.1.0",
     "nodemon": "^2.0.12",
     "prettier": "^1.19.1",
     "supertest": "^4.0.2"
